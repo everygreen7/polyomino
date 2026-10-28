@@ -112,6 +112,17 @@ input.name{width:100%;font-size:22px;padding:12px 14px;border:2.5px solid var(--
 .stat2 div{background:#fff;border:2px solid var(--ink);border-radius:12px;padding:8px;text-align:center}
 .stat2 b{display:block;font:400 28px/1.1 var(--display);color:var(--acc)}
 .stat2 span{font-size:12px;color:var(--sub)}
+.hist{margin-top:16px;display:flex;flex-direction:column;gap:10px}
+.hist h3{font-family:var(--display);font-weight:400;font-size:22px;margin:4px 0 0}
+.hc{background:#fff;border:2px solid var(--ink);border-radius:14px 8px 16px 10px;padding:12px 14px}
+.hc .ht{display:flex;justify-content:space-between;gap:8px;align-items:baseline}
+.hc .ht b{font-family:var(--display);font-weight:400;font-size:19px}
+.hc .ht span{font-size:12px;color:var(--mute);white-space:nowrap}
+.hc .hl{font-size:15px;margin-top:4px;line-height:1.6}
+.hc .hl em{font-style:normal;font-weight:800;color:var(--acc)}
+.hc .gal{justify-content:flex-start;gap:6px;margin-top:6px}
+.hc .chips{display:flex;flex-wrap:wrap;gap:6px;margin-top:6px}
+.hc .chips span{background:#f3eee6;border-radius:999px;padding:3px 10px;font-size:13px;font-weight:700}
 .ansrow{display:flex;gap:6px;align-items:center;justify-content:center;flex-wrap:wrap;margin-top:10px;font-weight:700}
 .ansrow input{width:80px;font-size:20px;padding:8px;border:2.5px solid var(--ink);border-radius:12px;text-align:center;-webkit-user-select:text;user-select:text}
 </style>
@@ -141,6 +152,7 @@ input.name{width:100%;font-size:22px;padding:12px 14px;border:2.5px solid var(--
    </div>
   </div>
   <div class="howto"><div><b>👆</b>끌어서<br>판에 놓기</div><div><b>🔄</b>조각을 톡<br>= 돌리기</div><div><b>↔️</b>뒤집기<br>버튼</div></div>
+  <div class="hist" id="hist" hidden></div>
  </section>
  <!-- 게임 -->
  <section id="s-game" hidden>
@@ -239,7 +251,7 @@ async function join(){
  try{const saved=store('poly_me');const r=await call('api_join',n,saved&&saved.name===n?saved.token:'');entered(r)}
  catch(e){$('joinErr').textContent=errText(e)}finally{$('joinBtn').disabled=false}
 }
-function entered(r){A.name=r.name;A.token=r.token;store('poly_me',r);$('who').textContent=r.name;$('top').hidden=false;show('wait');poll();}
+function entered(r){A.name=r.name;A.token=r.token;store('poly_me',r);$('who').textContent=r.name;$('top').hidden=false;show('wait');loadHistory();poll();}
 $('joinBtn').onclick=join;$('nameIn').addEventListener('keydown',e=>{if(e.key==='Enter')join()});
 function show(w){['join','wait','game'].forEach(x=>$('s-'+x).hidden=x!==w)}
 
@@ -267,7 +279,7 @@ function waitScreen(r){
  else{$('lastRes').hidden=true;$('waitTitle').textContent='선생님이 게임을 시작하면 열려요';$('waitSub').textContent='화면을 켜 둔 채로 기다려요.'}
 }
 function endRound(r){
- A.round=null;cancelDrag();A.activity='게임 끝';show('wait');waitScreen(r);
+ A.round=null;cancelDrag();A.activity='게임 끝';show('wait');waitScreen(r);setTimeout(loadHistory,600);
  $('waitTitle').textContent=r.state.mode==='real'?'게임 끝! 🎉':'활동 끝!';
  if(r.state.mode!=='real'){$('lastRes').hidden=true;$('waitSub').textContent='수고했어요. 다음 활동을 기다려요.'}
 }
@@ -298,6 +310,20 @@ function openGame(g){
  ['find','dom','fill'].forEach(x=>$('g-'+x).hidden=x!==(g==='domino'?'dom':g));
  if(g==='find')openFind();else if(g==='domino')openDom(DOMS[0].id);
  else if(A.mode==='real')openReal(firstOpen());else openPractice(0);
+}
+
+/* ═════════ 대기 화면: 내 기록 ═════════ */
+async function loadHistory(){
+ let h;try{h=await call('api_myhistory',A.name,A.token)}catch(e){return}
+ const box=$('hist');if(!h||!h.length){box.hidden=true;return}
+ const tm=t=>{const d=new Date(t);return d.getHours()+':'+String(d.getMinutes()).padStart(2,'0')};
+ box.innerHTML='<h3>내 기록</h3>'+h.map(x=>{let b='';
+  if(x.find)b+=`<div class="hl">🧩 찾은 펜토미노 <em>${x.find.shapes.length}개</em>${x.find.first?` · 반에서 처음 찾은 모양 <em>${x.find.first}개</em>`:''}${x.find.pending?` · 확인 중 ${x.find.pending}개`:''}</div>`+
+   (x.find.shapes.length?`<div class="gal">${x.find.shapes.map(f=>`<div class="it">${mini(f.cells,9)}<span>${f.letter}</span></div>`).join('')}</div>`:'');
+  if(x.dom)b+=`<div class="hl">🁢 도미노로 덮은 방법</div><div class="chips">${x.dom.map(d=>`<span>${d.board.replace('x','×')}: ${d.n}가지${d.ans!=null?` (예상 ${d.ans})`:''}</span>`).join('')}</div>`;
+  if(x.fill)b+=x.fill.practiced!==undefined?`<div class="hl">🖼️ 완성한 그림 <em>${x.fill.practiced}개</em></div>`:`<div class="hl">🏁 점수 <em>${x.fill.score}점</em> · 완성 ${x.fill.solved}/${x.fill.total}${x.fill.hints?` · 힌트 ${x.fill.hints}번`:''}</div>`;
+  return `<div class="hc"><div class="ht"><b>${x.label}</b><span>${tm(x.at)}</span></div>${b}</div>`}).join('');
+ box.hidden=false;
 }
 
 /* ═════════ 펜토미노 찾기 ═════════ */
