@@ -68,6 +68,27 @@ td.n{font-variant-numeric:tabular-nums;text-align:right;font-weight:800}
 .big table td{font-size:22px;padding:12px}.big .nm{font-size:26px}.big .rk{width:44px;height:44px;font-size:22px}.big .clock{font-size:96px}
 .big .hide-big{display:none}
 .empty{color:var(--mute);text-align:center;padding:30px}
+/* ═════ v2 ═════ */
+.panel{display:flex;flex-direction:column;gap:16px}
+.shapes{display:grid;grid-template-columns:repeat(auto-fill,minmax(118px,1fr));gap:10px}
+.sh{border:2.5px solid var(--ink);border-radius:14px;background:#fff;padding:8px;display:flex;flex-direction:column;align-items:center;gap:4px;cursor:pointer;text-align:center;font-family:var(--body)}
+.sh:hover{background:#fffaf2}.sh.on{border-color:var(--acc);box-shadow:0 0 0 3px var(--acc-soft)}
+.sh .lt{font:400 22px/1 var(--display);color:var(--acc)}
+.sh .who{font-size:13px;font-weight:800}.sh .cnt{font-size:12px;color:var(--sub)}
+.sh.empty{border-style:dashed;border-color:var(--line);cursor:default;justify-content:center;min-height:118px;color:var(--mute);font:400 30px var(--display)}
+.detail{border:2px dashed var(--acc);border-radius:14px;padding:12px;background:#fffafb}
+.subs{display:flex;flex-wrap:wrap;gap:10px}
+.sub{border:1.5px solid var(--line);border-radius:10px;background:#fff;padding:6px 8px;display:flex;flex-direction:column;align-items:center;gap:3px;font-size:12px}
+.sub b{font-size:13px}
+.rv{display:flex;flex-wrap:wrap;gap:10px}
+.rv .sub{min-width:120px}
+.rv .row2{display:flex;gap:4px}
+.rv .btn{padding:4px 8px;font-size:12px;border-width:2px}
+.small{font-size:13px;color:var(--sub)}
+.dist{display:flex;flex-wrap:wrap;gap:6px}
+.dist span{background:#f3eee6;border-radius:999px;padding:3px 10px;font-size:13px;font-weight:700}
+.dist span b{color:var(--acc)}
+.big .shapes{grid-template-columns:repeat(auto-fill,minmax(170px,1fr))}.big .sh .lt{font-size:32px}.big .sh .who{font-size:18px}
 </style>
 </head>
 <body>
@@ -89,24 +110,22 @@ td.n{font-variant-numeric:tabular-nums;text-align:right;font-weight:800}
    </div>
   </div>
   <div class="grid">
-   <div class="side" style="gap:16px">
-    <!-- 게임 설정 -->
+   <div class="panel">
     <div class="card hide-big" id="setup">
-     <h2>새 게임 시작</h2>
+     <h2>새 활동 시작</h2>
      <div class="games" id="games">
-      <button class="g on" data-g="fill"><b>그림 채우기</b><span>칠교처럼 그림을 조각으로 채우기</span></button>
-      <button class="g" data-g="speed"><b>스피드 퍼즐</b><span>우봉고 방식, 빨리 채우기</span></button>
-      <button class="g" data-g="domino"><b>도미노 도전</b><span>연습 전용 · 덮을 수 있을까?</span></button>
-      <button class="g" data-g="free"><b>자유 연습</b><span>세 게임을 마음대로</span></button>
+      <button class="g on" data-g="find"><b>펜토미노 찾기</b><span>모양을 그려 제출 · 연습</span></button>
+      <button class="g" data-g="domino"><b>도미노 방법 모으기</b><span>덮는 방법 수집 · 연습</span></button>
+      <button class="g" data-g="fill"><b>그림 채우기</b><span>연습 / 실전(15문제)</span></button>
+      <button class="g" data-g="free"><b>자유 연습</b><span>세 활동을 마음대로</span></button>
      </div>
      <div class="row"><span class="lab">모드</span>
       <div class="seg" id="modeSeg"><button data-m="practice" class="on">연습</button><button data-m="real">실전 (점수)</button></div>
       <span class="act" id="modeNote"></span></div>
      <div class="row"><span class="lab">시간</span>
-      <button class="btn" data-d="-1">−</button><input id="mins" class="num" type="number" min="1" max="60" value="5"><button class="btn" data-d="1">+</button><span>분</span>
-      <span style="flex:1"></span><button class="btn pri" id="startBtn" style="font-size:18px;padding:12px 26px">▶ 게임 시작</button></div>
+      <button class="btn" data-d="-1">−</button><input id="mins" class="num" type="number" min="1" max="60" value="8"><button class="btn" data-d="1">+</button><span>분</span>
+      <span style="flex:1"></span><button class="btn pri" id="startBtn" style="font-size:18px;padding:12px 26px">▶ 시작</button></div>
     </div>
-    <!-- 진행 중 -->
     <div class="card" id="running" hidden>
      <div class="live">
       <div style="flex:1;min-width:220px"><span class="badge" id="stBadge"></span> <span class="badge" id="mdBadge"></span>
@@ -114,25 +133,41 @@ td.n{font-variant-numeric:tabular-nums;text-align:right;font-weight:800}
       <div class="clock" id="clock">0:00</div>
      </div>
      <div class="row hide-big">
-      <button class="btn" id="pauseBtn">⏸ 일시정지</button>
-      <button class="btn" id="addBtn">+1분</button>
-      <span style="flex:1"></span>
-      <span id="endWrap"><button class="btn danger" id="endBtn">■ 지금 끝내기</button></span>
+      <button class="btn" id="pauseBtn">⏸ 일시정지</button><button class="btn" id="addBtn">+1분</button>
+      <span style="flex:1"></span><span id="endWrap"><button class="btn danger" id="endBtn">■ 지금 끝내기</button></span>
      </div>
     </div>
-    <!-- 순위표 -->
+    <div class="row" style="margin:0;justify-content:flex-end"><select id="roundSel" class="btn hide-big" style="padding:6px 10px"></select></div>
+    <!-- 펜토미노 찾기 -->
+    <div class="card" id="pFind" hidden>
+     <div class="row" style="margin:0 0 10px;justify-content:space-between"><h2 style="margin:0">발견한 펜토미노 <span id="fCount" style="color:var(--acc)"></span></h2>
+      <label class="small hide-big"><input type="checkbox" id="showSlots"> 빈칸 12개 보이기</label></div>
+     <div class="shapes" id="fShapes"></div>
+     <div class="detail" id="fDetail" hidden></div>
+    </div>
+    <div class="card hide-big" id="pReview" hidden>
+     <h2>검토 대기 <span id="rvCount" style="color:var(--acc)"></span> <span class="act">펜토미노가 아닌 제출 · 승인하면 대시보드에 보여요</span></h2>
+     <div class="rv" id="rvList"></div>
+    </div>
+    <div class="card" id="pWrong" hidden>
+     <h2>펜토미노가 아닌 모양 <span class="act">왜 안 될까요?</span></h2>
+     <div class="rv" id="wrList"></div>
+    </div>
+    <!-- 도미노 -->
+    <div class="card" id="pDom" hidden>
+     <h2>도미노 방법 모으기 <span class="act">판마다 학생이 찾은 방법 수 / 학생이 낸 예상</span></h2>
+     <div class="tblwrap"><table id="domTbl"></table></div>
+    </div>
+    <!-- 표 -->
     <div class="card">
-     <div class="row" style="margin:0 0 8px;justify-content:space-between">
-      <h2 style="margin:0" id="tblTitle">학생 현황</h2>
-      <select id="roundSel" class="btn hide-big" style="padding:6px 10px"></select>
-     </div>
+     <h2 id="tblTitle">학생 현황</h2>
      <div class="tblwrap"><table id="tbl"></table></div>
     </div>
    </div>
    <div class="side">
-    <div class="card"><h2>누적 순위 <span class="act">(실전 라운드 합계)</span></h2><div class="tot" id="tot"><p class="empty">아직 실전 기록이 없어요.</p></div></div>
+    <div class="card"><h2>누적 순위 <span class="act">(실전 합계)</span></h2><div class="tot" id="tot"><p class="empty">아직 실전 기록이 없어요.</p></div></div>
     <div class="card hide-big"><h2>도움말</h2>
-     <p class="act" style="line-height:1.7;margin:0">· 학생 주소는 이 주소에서 <b>teacher.html</b>(또는 <b>?view=teacher</b>)을 뺀 것이에요.<br>· 실전 점수: 퍼즐 1개 10점 + 빠르기 보너스(최대 5점).<br>· 모든 기록은 구글 시트의 <b>기록</b>, <b>순위</b> 탭에 남아요.<br>· 같은 이름이 두 번 들어오면 표에서 ✕로 내보낼 수 있어요.</p>
+     <p class="act" style="line-height:1.7;margin:0">· 학생 주소는 이 주소에서 <b>teacher.html</b>(또는 <b>/teacher</b>, <b>?view=teacher</b>)을 뺀 것이에요.<br>· 그림 채우기 실전: 1문제 10점, 힌트 1번에 −3점(문제당 2번까지), 15번(6×10)은 힌트 없음.<br>· 펜토미노 모양을 누르면 같은 모양을 낸 학생이 모두 보여요.<br>· 모든 기록은 구글 시트의 <b>기록</b>, <b>순위</b> 탭에 남아요.</p>
      <div class="row"><span id="resetWrap"><button class="btn danger" id="resetBtn">모두 초기화 (새 반 시작)</button></span></div>
     </div>
    </div>
@@ -157,89 +192,127 @@ function call(fn){const args=[].slice.call(arguments,1);
  if(window.google&&google.script&&google.script.run){google.script.run.withSuccessHandler(res).withFailureHandler(e=>rej(e))[fn].apply(null,args)}
  else if(window.__gs){window.__gs(fn,args).then(r=>{if(r&&r.__err)rej(new Error(r.__err));else res(r)},rej)}
  else rej(new Error('서버에 연결할 수 없어요'))})}
+
 const $=id=>document.getElementById(id);
 const errText=e=>String((e&&e.message)||e).replace(/^(Error|Exception):\s*/,'');
-const GN={fill:'그림 채우기',speed:'스피드 퍼즐',domino:'도미노 도전',free:'자유 연습'};
-const T={pw:'',game:'fill',mode:'practice',view:'',data:null,offset:0,timer:null};
+const GN={find:'펜토미노 찾기',domino:'도미노 방법 모으기',fill:'그림 채우기',free:'자유 연습'};
+const T={pw:'',game:'find',mode:'practice',view:'',data:null,offset:0,timer:null,open:null};
 try{T.pw=sessionStorage.getItem('poly_pw')||''}catch(e){}
+function esc(s){return String(s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]))}
+function shp(cells,s,col){if(!cells||!cells.length)return '';const r0=Math.min(...cells.map(x=>x[0])),c0=Math.min(...cells.map(x=>x[1]));
+ const h=Math.max(...cells.map(x=>x[0]))-r0+1,w=Math.max(...cells.map(x=>x[1]))-c0+1;
+ return `<svg width="${w*s+2}" height="${h*s+2}" viewBox="0 0 ${w*s+2} ${h*s+2}">`+cells.map(([r,c])=>`<rect x="${1+(c-c0)*s}" y="${1+(r-r0)*s}" width="${s}" height="${s}" fill="${col}" stroke="#262222" stroke-width="1.5"/>`).join('')+'</svg>'}
+function tm(t){const d=new Date(t);return d.getHours()+':'+String(d.getMinutes()).padStart(2,'0')+':'+String(d.getSeconds()).padStart(2,'0')}
 
 async function login(){
  const pw=$('pw').value||T.pw;
- try{await call('api_t_login',pw);T.pw=pw;try{sessionStorage.setItem('poly_pw',pw)}catch(e){}
-  $('login').hidden=true;$('dash').hidden=false;refresh()}
+ try{await call('api_t_login',pw);T.pw=pw;try{sessionStorage.setItem('poly_pw',pw)}catch(e){}$('login').hidden=true;$('dash').hidden=false;refresh()}
  catch(e){$('loginMsg').textContent=errText(e)}
 }
 $('loginBtn').onclick=login;$('pw').addEventListener('keydown',e=>{if(e.key==='Enter')login()});
 if(T.pw){$('pw').value=T.pw;login()}
 
-/* 설정 */
 document.querySelectorAll('#games .g').forEach(b=>b.onclick=()=>{T.game=b.dataset.g;document.querySelectorAll('#games .g').forEach(x=>x.classList.toggle('on',x===b));setMode(T.mode)});
 document.querySelectorAll('#modeSeg button').forEach(b=>b.onclick=()=>setMode(b.dataset.m));
-function setMode(m){const only=T.game==='domino'||T.game==='free';T.mode=only?'practice':m;
+function setMode(m){const only=T.game!=='fill';T.mode=only?'practice':m;
  document.querySelectorAll('#modeSeg button').forEach(b=>{b.classList.toggle('on',b.dataset.m===T.mode);b.disabled=only&&b.dataset.m==='real'});
- $('modeNote').textContent=only?'이 게임은 연습만 할 수 있어요.':(T.mode==='real'?(T.game==='speed'?'모두 같은 순서로 15세트':'모두 같은 순서로 그림 11개')+' · 점수·순위 기록':'학생이 퍼즐을 골라서 · 점수 없음');
- $('mins').value=T.mode==='real'?10:5}
+ $('modeNote').textContent=only?'이 활동은 연습만 있어요.':(T.mode==='real'?'모두 같은 15문제 · 번호로 오가며 풀기 · 점수와 순위 기록':'학생이 그림을 골라서 · 점수 없음');
+ $('mins').value=T.mode==='real'?15:(T.game==='fill'?5:8)}
 document.querySelectorAll('[data-d]').forEach(b=>b.onclick=()=>{$('mins').value=Math.max(1,Math.min(60,(+$('mins').value||5)+(+b.dataset.d)))});
 setMode('practice');
 
 async function ctl(action,opt){$('msg').textContent='';
- try{await call('api_t_control',T.pw,action,opt||{});T.view='';await refresh(true)}catch(e){$('msg').textContent=errText(e)}}
+ try{await call('api_t_control',T.pw,action,opt||{});T.view='';T.open=null;await refresh()}catch(e){$('msg').textContent=errText(e)}}
 $('startBtn').onclick=()=>ctl('start',{game:T.game,mode:T.mode,minutes:+$('mins').value});
 $('pauseBtn').onclick=()=>ctl(T.data&&T.data.state.status==='paused'?'resume':'pause');
 $('addBtn').onclick=()=>ctl('addtime',{minutes:1});
 function confirmIn(wrapId,text,yes){const w=$(wrapId),old=w.innerHTML;
  w.innerHTML=`<span class="confirm">${text} <button class="btn danger">예</button><button class="btn">아니요</button></span>`;
- const[b1,b2]=w.querySelectorAll('button');const back=()=>{w.innerHTML=old;bindDanger()};
- b1.onclick=()=>{back();yes()};b2.onclick=back}
+ const[b1,b2]=w.querySelectorAll('button');const back=()=>{w.innerHTML=old;bindDanger()};b1.onclick=()=>{back();yes()};b2.onclick=back}
 function bindDanger(){
  if($('endBtn'))$('endBtn').onclick=()=>confirmIn('endWrap','지금 끝낼까요?',()=>ctl('end'));
  if($('resetBtn'))$('resetBtn').onclick=()=>confirmIn('resetWrap','학생·기록 현황을 모두 지울까요? (시트 기록은 남아요)',()=>ctl('reset'));
 }
 bindDanger();
-$('roundSel').onchange=()=>{T.view=$('roundSel').value;refresh(true)};
+$('roundSel').onchange=()=>{T.view=$('roundSel').value;T.open=null;refresh()};
 $('bigBtn').onclick=()=>{document.body.classList.toggle('big');$('bigBtn').textContent=document.body.classList.contains('big')?'작게 보기':'크게 보기'};
+$('showSlots').onchange=()=>T.data&&drawFind(T.data.find);
 
-/* 새로 고침 */
-async function refresh(once){
+async function refresh(){
  clearTimeout(T.timer);
  try{const t0=Date.now();const d=await call('api_t_state',T.pw,T.view||null);T.offset=d.now-(t0+Date.now())/2;T.data=d;draw(d);$('msg').textContent=''}
  catch(e){$('msg').textContent='연결 문제: '+errText(e)}
  T.timer=setTimeout(refresh,3000);
 }
+async function review(name,id,action){
+ try{await call('api_t_review',T.pw,{roundId:T.data.round&&T.data.round.id,name,id,action});refresh()}catch(e){$('msg').textContent=errText(e)}}
 function fmt(ms){const s=Math.max(0,Math.ceil(ms/1000));return Math.floor(s/60)+':'+String(s%60).padStart(2,'0')}
+
 function draw(d){
  const s=d.state,live=s.status==='running'||s.status==='paused';
  $('cOn').textContent=d.counts.online;$('cJoin').textContent=d.counts.joined;
  $('setup').hidden=live;$('running').hidden=!(live||s.status==='ended');
  $('pauseBtn').hidden=!live;$('addBtn').hidden=!live;$('endWrap').hidden=!live;
- if(s.roundId){
-  const st={running:'진행 중',paused:'일시정지',ended:'끝남'}[s.status]||'';
+ if(s.roundId){const st={running:'진행 중',paused:'일시정지',ended:'끝남'}[s.status]||'';
   $('stBadge').textContent=st;$('stBadge').className='badge '+(s.status==='running'?'':s.status);
   $('mdBadge').textContent=s.mode==='real'?'실전':'연습';$('mdBadge').className='badge '+(s.mode==='real'?'real':'prac');
-  $('stLabel').textContent=GN[s.game]+' · '+s.roundId;
-  $('pauseBtn').textContent=s.status==='paused'?'▶ 다시 시작':'⏸ 일시정지';
- }
- // 라운드 선택
+  $('stLabel').textContent=GN[s.game]+' · '+s.roundId;$('pauseBtn').textContent=s.status==='paused'?'▶ 다시 시작':'⏸ 일시정지'}
  const sel=$('roundSel');const cur=T.view||(s.roundId||'');
  sel.innerHTML=(d.rounds.length?'':'<option value="">라운드 없음</option>')+d.rounds.slice().reverse().map(r=>`<option value="${r.id}"${r.id===cur?' selected':''}>${r.label}${r.id===s.roundId&&live?' (지금)':''}</option>`).join('');
- const rd=d.round;const real=rd&&rd.mode==='real';
- $('tblTitle').textContent=rd?(real?'실시간 순위':'연습 현황')+' · '+rd.label:'학생 현황';
- if($('tbl').querySelector('.confirm'))return drawTot(d);
- let h='<tr><th>'+(real?'순위':'')+'</th><th>이름</th>'+(real?'<th style="text-align:right">점수</th>':'')+'<th style="text-align:right">완성</th>'+(real?'<th>진행</th>':'')+'<th>지금 하는 일</th><th class="hide-big"></th></tr>';
- if(!d.rows.length)h+='<tr><td colspan="7" class="empty">아직 입장한 학생이 없어요.</td></tr>';
+ const rd=d.round,g=rd?rd.game:null;
+ $('pFind').hidden=!d.find;$('pReview').hidden=!d.find;$('pWrong').hidden=!(d.find&&d.find.approved.length);
+ if(d.find)drawFind(d.find);
+ $('pDom').hidden=!d.dom;if(d.dom)drawDom(d.dom,d.rows);
+ drawTable(d,rd);drawTot(d);
+}
+function drawFind(f){
+ const n=f.groups.length;$('fCount').textContent=n+'가지';
+ let h=f.groups.map(gp=>{const first=gp.subs[0];return `<button class="sh${T.open===gp.canon?' on':''}" data-c="${gp.canon}"><span class="lt">${gp.letter}</span>${shp(first.cells,document.body.classList.contains('big')?22:16,'#ffd66b')}<span class="who">${esc(first.name)}</span><span class="cnt">${gp.subs.length}명이 찾음</span></button>`}).join('');
+ if($('showSlots').checked)for(let i=n;i<12;i++)h+='<div class="sh empty">?</div>';
+ if(!n&&!$('showSlots').checked)h='<p class="empty" style="grid-column:1/-1">아직 제출된 펜토미노가 없어요.</p>';
+ $('fShapes').innerHTML=h;
+ $('fShapes').querySelectorAll('.sh[data-c]').forEach(b=>b.onclick=()=>{T.open=T.open===b.dataset.c?null:b.dataset.c;drawFind(T.data.find)});
+ const gp=f.groups.find(x=>x.canon===T.open);$('fDetail').hidden=!gp;
+ if(gp)$('fDetail').innerHTML=`<b>${gp.letter} 모양을 낸 학생 ${gp.subs.length}명</b> <span class="small">(제출한 순서 · 각자 그린 방향 그대로)</span><div class="subs" style="margin-top:8px">`+
+  gp.subs.map((x,i)=>`<div class="sub">${shp(x.cells,12,i?'#8fd6cd':'#ffd66b')}<b>${i+1}. ${esc(x.name)}</b><span class="small">${tm(x.t)}</span></div>`).join('')+'</div>';
+ $('rvCount').textContent=f.pending.length?f.pending.length+'개':'';
+ $('rvList').innerHTML=f.pending.length?f.pending.map(x=>`<div class="sub">${shp(x.cells,12,'#cfc8bd')}<b>${esc(x.name)}</b><span class="small">${x.cells.length}칸 · ${tm(x.t)}</span><span class="row2"><button class="btn pri" data-a="approve" data-n="${esc(x.name)}" data-i="${x.id}">승인</button><button class="btn" data-a="hide" data-n="${esc(x.name)}" data-i="${x.id}">숨기기</button></span></div>`).join(''):'<p class="small">검토할 제출물이 없어요.</p>';
+ $('wrList').innerHTML=f.approved.map(x=>`<div class="sub">${shp(x.cells,14,'#f7c7b5')}<b>${esc(x.name)}</b><span class="small">${x.cells.length}칸</span><span class="row2 hide-big"><button class="btn" data-a="hide" data-n="${esc(x.name)}" data-i="${x.id}">숨기기</button></span></div>`).join('');
+ document.querySelectorAll('#rvList [data-a],#wrList [data-a]').forEach(b=>b.onclick=()=>{b.disabled=true;review(b.dataset.n,b.dataset.i,b.dataset.a)});
+}
+function drawDom(dm,rows){
+ const B=dm.boards,lab=b=>b.replace('x','×');
+ let h='<tr><th>이름</th>'+B.map(b=>`<th style="text-align:center">${lab(b)}</th>`).join('')+'</tr>';
+ const names=rows.map(r=>r.name);
+ names.forEach(n=>{const s=dm.students[n]||{};h+=`<tr><td class="nm">${esc(n)}</td>`+B.map(b=>{const x=s[b];return `<td style="text-align:center">${x?`<b>${x.n}</b>${x.ans!=null?` <span class="small">/ 예상 ${x.ans}</span>`:''}`:'<span class="small">-</span>'}</td>`}).join('')+'</tr>'});
+ h+='<tr><td class="small">예상 분포</td>'+B.map(b=>{const cnt={};names.forEach(n=>{const x=(dm.students[n]||{})[b];if(x&&x.ans!=null)cnt[x.ans]=(cnt[x.ans]||0)+1});
+  const ks=Object.keys(cnt).sort((a,c)=>cnt[c]-cnt[a]||a-c);return `<td><div class="dist" style="justify-content:center">${ks.map(k=>`<span><b>${k}</b>가지 ${cnt[k]}명</span>`).join('')||'<span class="small">-</span>'}</div></td>`}).join('')+'</tr>';
+ h+='<tr><td class="small">반 최고 기록</td>'+B.map(b=>{let m=0;names.forEach(n=>{const x=(dm.students[n]||{})[b];if(x)m=Math.max(m,x.n)});return `<td style="text-align:center"><b>${m||'-'}</b></td>`}).join('')+'</tr>';
+ $('domTbl').innerHTML=h;
+}
+function drawTable(d,rd){
+ if($('tbl').querySelector('.confirm'))return;
+ const real=rd&&rd.mode==='real',g=rd?rd.game:null;
+ $('tblTitle').textContent=rd?(real?'실시간 순위':'학생 현황')+' · '+rd.label:'학생 현황';
+ const cols=real?['순위','이름','점수','완성','힌트','지금 하는 일','']:g==='find'?['','이름','찾은 모양','확인 대기','지금 하는 일','']:g==='domino'?['','이름','기록한 방법','지금 하는 일','']:['','이름','완성','지금 하는 일',''];
+ let h='<tr>'+cols.map(c=>`<th>${c}</th>`).join('')+'</tr>';
+ if(!d.rows.length)h+=`<tr><td colspan="${cols.length}" class="empty">아직 입장한 학생이 없어요.</td></tr>`;
  let rank=0,prev=null;
- d.rows.forEach((x,i)=>{const key=x.score+'/'+x.solved;if(key!==prev){rank=i+1;prev=key}
-  const pc=d.puzzleCount||1;const prog=real?`<td style="white-space:nowrap">${Math.min(x.idx,pc)}/${pc}<span class="bar"><i style="width:${100*Math.min(x.idx,pc)/pc}%"></i></span>${x.skips?` <span class="act">건너뜀 ${x.skips}</span>`:''}</td>`:'';
-  h+=`<tr><td>${real?`<span class="rk ${x.score>0&&rank<=3?'r'+rank:''}">${rank}</span>`:''}</td><td><span class="dot${x.online?' on':''}"></span><span class="nm">${esc(x.name)}</span></td>${real?`<td class="n" style="color:var(--acc);font-size:18px">${x.score}</td>`:''}<td class="n">${x.solved}</td>${prog}<td class="act">${x.online?esc(x.activity||''):'접속 끊김'+(x.seenAgo!=null?` (${x.seenAgo}초 전)`:'')}</td><td class="hide-big"><button class="x" title="내보내기" data-k="${esc(x.name)}">✕</button></td></tr>`});
+ d.rows.forEach((x,i)=>{if(x.score!==prev){rank=i+1;prev=x.score}
+  const act=`<td class="act">${x.online?esc(x.activity||''):'접속 끊김'+(x.seenAgo!=null?` (${x.seenAgo}초 전)`:'')}</td>`;
+  const nm=`<td><span class="dot${x.online?' on':''}"></span><span class="nm">${esc(x.name)}</span></td>`;
+  const kick=`<td class="hide-big"><button class="x" title="내보내기" data-k="${esc(x.name)}">✕</button></td>`;
+  if(real)h+=`<tr><td><span class="rk ${x.score>0&&rank<=3?'r'+rank:''}">${rank}</span></td>${nm}<td class="n" style="color:var(--acc);font-size:18px">${x.score}</td><td class="n">${x.solved}/${d.puzzleCount}</td><td class="n">${x.hints||0}</td>${act}${kick}</tr>`;
+  else if(g==='find')h+=`<tr><td></td>${nm}<td class="n">${x.found}</td><td class="n">${x.wrong}</td>${act}${kick}</tr>`;
+  else if(g==='domino')h+=`<tr><td></td>${nm}<td class="n">${x.dom}</td>${act}${kick}</tr>`;
+  else h+=`<tr><td></td>${nm}<td class="n">${x.solved}</td>${act}${kick}</tr>`});
  $('tbl').innerHTML=h;
  $('tbl').querySelectorAll('.x').forEach(b=>b.onclick=()=>{const n=b.dataset.k;b.outerHTML=`<span class="confirm">내보낼까요? <button class="btn danger" style="padding:4px 8px">예</button></span>`;
   $('tbl').querySelector('.confirm .btn').onclick=()=>ctl('kick',{name:n})});
- drawTot(d);
 }
 function drawTot(d){
  $('tot').innerHTML=d.total.length?'<ol>'+d.total.map((x,i)=>`<li><span><span class="rk ${i<3&&x.score>0?'r'+(i+1):''}" style="width:24px;height:24px;font-size:12px">${i+1}</span> ${esc(x.name)}</span><span>${x.score}점 · ${x.solved}개</span></li>`).join('')+'</ol>':'<p class="empty">아직 실전 기록이 없어요.</p>';
 }
-function esc(s){return String(s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]))}
 setInterval(()=>{const d=T.data;if(!d)return;const s=d.state;
  if(s.status==='running'){const left=s.endAt-(Date.now()+T.offset);$('clock').textContent=fmt(left);$('clock').classList.toggle('low',left<30000);if(left<=0&&!T.z){T.z=1;setTimeout(()=>{T.z=0;refresh()},1200)}}
  else if(s.status==='paused')$('clock').textContent=fmt(s.remainMs);else if(s.status==='ended')$('clock').textContent='끝';},250);

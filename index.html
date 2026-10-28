@@ -91,6 +91,28 @@ input.name{width:100%;font-size:22px;padding:12px 14px;border:2.5px solid var(--
 .toast small{display:block;font-family:var(--body);font-size:14px;color:var(--sub);margin-top:4px}
 @keyframes pop{from{transform:translate(-50%,-50%) scale(.6);opacity:0}}
 .net{position:fixed;bottom:10px;left:50%;transform:translateX(-50%);background:#fff3cd;border:2px solid #e0b400;border-radius:999px;padding:5px 14px;font-size:13px;font-weight:700;z-index:80}
+/* ═════ v2 추가 스타일 ═════ */
+.nums{display:flex;gap:6px;overflow-x:auto;padding:2px 2px 8px;scrollbar-width:thin}
+.num{flex:0 0 auto;min-width:40px;height:40px;border-radius:12px;border:2px solid var(--line);background:#fff;font:400 18px/1 var(--display);color:var(--ink);cursor:pointer;padding:0 6px}
+.num.seen{border-color:#e08a00;background:#fff4e0}
+.num.done{border-color:var(--ok);background:#e3f4ea;color:var(--ok)}
+.num.done::after{content:"✓";font-size:12px;margin-left:2px}
+.num.cur{outline:3px solid var(--ink);outline-offset:1px}
+.ptitle2{font-family:var(--display);font-size:20px;text-align:center;margin:2px 0}
+.hintc{font-size:12px;opacity:.8;display:block;margin-top:1px}
+.grid6{position:relative;touch-action:manipulation;margin:6px auto 8px}
+.g6{position:absolute;border:1.5px solid #b9b0a3;background:#fff;padding:0;cursor:pointer}
+.g6.on{background:#ffd66b;border-color:var(--ink)}
+.gal{display:flex;flex-wrap:wrap;gap:10px;justify-content:center;margin-top:8px}
+.gal .it{background:#fff;border:2px solid var(--line);border-radius:10px;padding:5px;display:flex;flex-direction:column;align-items:center;gap:2px;font-size:11px;color:var(--sub)}
+.gal .it.pend{border-style:dashed;opacity:.7}
+.sec{font-family:var(--display);font-size:19px;margin:14px 0 2px}
+.stat2{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin:8px 0}
+.stat2 div{background:#fff;border:2px solid var(--ink);border-radius:12px;padding:8px;text-align:center}
+.stat2 b{display:block;font:400 28px/1.1 var(--display);color:var(--acc)}
+.stat2 span{font-size:12px;color:var(--sub)}
+.ansrow{display:flex;gap:6px;align-items:center;justify-content:center;flex-wrap:wrap;margin-top:10px;font-weight:700}
+.ansrow input{width:80px;font-size:20px;padding:8px;border:2.5px solid var(--ink);border-radius:12px;text-align:center;-webkit-user-select:text;user-select:text}
 </style>
 </head>
 <body>
@@ -114,7 +136,7 @@ input.name{width:100%;font-size:22px;padding:12px 14px;border:2.5px solid var(--
    <div class="big" id="waitTitle">선생님이 게임을 시작하면 열려요</div>
    <p class="note" id="waitSub">화면을 켜 둔 채로 기다려요.</p>
    <div id="lastRes" hidden>
-    <div class="res"><div><b id="rScore">0</b><span>점수</span></div><div><b id="rSolved">0</b><span>완성한 퍼즐</span></div><div><b id="rRank">-</b><span>순위</span></div></div>
+    <div class="res"><div><b id="rScore">0</b><span>점수</span></div><div><b id="rSolved">0</b><span>완성한 그림</span></div><div><b id="rRank">-</b><span>순위</span></div></div>
    </div>
   </div>
   <div class="howto"><div><b>👆</b>끌어서<br>판에 놓기</div><div><b>🔄</b>조각을 톡<br>= 돌리기</div><div><b>↔️</b>뒤집기<br>버튼</div></div>
@@ -122,15 +144,41 @@ input.name{width:100%;font-size:22px;padding:12px 14px;border:2.5px solid var(--
  <!-- 게임 -->
  <section id="s-game" hidden>
   <div class="tabs" id="freeTabs" hidden>
-   <button class="btn" data-g="fill">그림 채우기</button><button class="btn" data-g="speed">스피드 퍼즐</button><button class="btn" data-g="domino">도미노 도전</button>
+   <button class="btn" data-g="find">펜토미노 찾기</button><button class="btn" data-g="domino">도미노 방법</button><button class="btn" data-g="fill">그림 채우기</button>
   </div>
-  <div class="plist" id="plist" hidden></div>
-  <div class="prog" id="prog" hidden><span class="ptitle" id="progTxt"></span><span class="bar"><i id="progBar"></i></span></div>
-  <div class="msg" id="msg"></div>
-  <div class="stage"><div class="board" id="board"></div></div>
-  <div class="tray" id="tray"></div>
-  <div class="ctrl" id="ctrl"></div>
-  <p class="note" id="gnote"></p>
+  <!-- 펜토미노 찾기 -->
+  <div id="g-find" hidden>
+   <div class="ptitle2">정사각형 5개를 변끼리 붙인 모양을 찾아요</div>
+   <div class="msg" id="fMsg">칸을 눌러 칠하고 [제출하기]를 눌러요.</div>
+   <div class="grid6" id="fGrid"></div>
+   <div class="ctrl" style="grid-template-columns:1fr 2fr"><button class="btn" id="fClear">지우기</button><button class="btn pri" id="fSend">제출하기</button></div>
+   <div class="stat2"><div><b id="fMine">0</b><span>내가 찾은 모양</span></div><div><b id="fClass">0</b><span>우리 반이 찾은 서로 다른 모양</span></div></div>
+   <div class="sec">내가 찾은 모양</div>
+   <div class="gal" id="fGal"><span class="note">아직 없어요.</span></div>
+   <p class="note">돌리거나 뒤집어서 같아지는 모양은 같은 모양이에요.</p>
+  </div>
+  <!-- 도미노 방법 모으기 -->
+  <div id="g-dom" hidden>
+   <div class="plist" id="dList"></div>
+   <div class="msg" id="dMsg"></div>
+   <div class="stage"><div class="board" id="dBoard"></div></div>
+   <div class="ctrl" style="grid-template-columns:1fr 1fr 2fr"><button class="btn on" id="dCol">색칠 보기</button><button class="btn" id="dClr">지우기</button><button class="btn pri" id="dRec" disabled>기록하기</button></div>
+   <div class="sec" id="dGalT">내가 찾은 방법</div>
+   <div class="gal" id="dGal"></div>
+   <div class="ansrow"><span id="dAskT">이 판을 덮는 방법은 모두</span><input id="dAns" type="number" min="0" inputmode="numeric"><span>가지</span><button class="btn" id="dAnsBtn">내 답 제출</button></div>
+   <p class="note" id="dAnsNote"></p>
+  </div>
+  <!-- 그림 채우기 -->
+  <div id="g-fill" hidden>
+   <div class="plist" id="plist" hidden></div>
+   <div class="nums" id="nums" hidden></div>
+   <div class="ptitle2" id="pTitle"></div>
+   <div class="msg" id="msg"></div>
+   <div class="stage"><div class="board" id="board"></div></div>
+   <div class="tray" id="tray"></div>
+   <div class="ctrl" id="ctrl"></div>
+   <p class="note" id="gnote"></p>
+  </div>
  </section>
 </div>
 <div class="ov" id="pauseOv" hidden><div class="card"><div class="big">잠깐 멈춤 ✋</div><p class="note">선생님 설명을 들어요. 남은 시간은 그대로예요.</p></div></div>
@@ -158,17 +206,24 @@ const $=id=>document.getElementById(id);
 function store(k,v){try{if(v===undefined)return JSON.parse(localStorage.getItem(k)||'null');localStorage.setItem(k,JSON.stringify(v))}catch(e){return null}}
 function errText(e){return String((e&&e.message)||e).replace(/^Error:\s*/,'').replace(/^Exception:\s*/,'')}
 
-/* ═════════ 조각 모양 ═════════ */
+
+/* ═════════ 모양 도우미 ═════════ */
 const COLORS={I3:'#ffb48a',L3:'#f5a3e0',I4:'#9cc8f5',O4:'#ffd66b',T4:'#b9a3f0',S4:'#8fd6cd',L4:'#ff9fb7',
  F:'#ff9fb7',I:'#9cc8f5',L:'#ffd66b',N:'#8fd6cd',P:'#b9a3f0',T:'#ffb48a',U:'#b6e39a',V:'#f5a3e0',W:'#a7d7f0',X:'#f0c27a',Y:'#c7b7f5',Z:'#9fe0b8'};
 function normC(cells){const r0=Math.min(...cells.map(x=>x[0])),c0=Math.min(...cells.map(x=>x[1]));return cells.map(([r,c])=>[r-r0,c-c0]).sort((a,b)=>a[0]-b[0]||a[1]-b[1])}
 const rot=cells=>normC(cells.map(([r,c])=>[c,-r]));
 const flip=cells=>normC(cells.map(([r,c])=>[r,-c]));
 const dims=cells=>[Math.max(...cells.map(x=>x[0]))+1,Math.max(...cells.map(x=>x[1]))+1];
+const key=cells=>normC(cells).map(x=>x.join(',')).join(';');
+function canon(cells){let c=normC(cells),best=null;for(let f=0;f<2;f++){for(let k=0;k<4;k++){c=rot(c);const s=key(c);if(best===null||s<best)best=s}c=flip(c)}return best}
+function isPento(cells){if(cells.length!==5)return false;const set=new Set(cells.map(x=>x.join()));const st=[cells[0]],seen=new Set([cells[0].join()]);
+ while(st.length){const[r,c]=st.pop();[[1,0],[-1,0],[0,1],[0,-1]].forEach(([a,b])=>{const k=(r+a)+','+(c+b);if(set.has(k)&&!seen.has(k)){seen.add(k);st.push([r+a,c+b])}})}return seen.size===5}
+function mini(cells,s,col){if(!cells.length)return '';const n=normC(cells),[h,w]=dims(n);
+ return `<svg width="${w*s+2}" height="${h*s+2}" viewBox="0 0 ${w*s+2} ${h*s+2}">`+n.map(([r,c])=>`<rect x="${1+c*s}" y="${1+r*s}" width="${s}" height="${s}" fill="${col||'#ffd66b'}" stroke="#262222" stroke-width="1.5"/>`).join('')+'</svg>'}
 
 /* ═════════ 앱 상태 ═════════ */
-const A={name:null,token:null,bank:null,offset:0,state:{status:'idle'},me:null,round:null,game:null,mode:null,
- pIdx:0,doneP:{},busy:false,pollT:null,activity:'대기'};
+const A={name:null,token:null,bank:null,offset:0,state:{status:'idle'},me:null,round:null,game:null,mode:null,cls:null,
+ doneP:{},busy:false,pollT:null,activity:'대기',find:[],dom:{},fill:{cur:0,saved:{},seen:{}}};
 
 /* ═════════ 입장 ═════════ */
 async function boot(){
@@ -185,121 +240,203 @@ async function join(){
 }
 function entered(r){A.name=r.name;A.token=r.token;store('poly_me',r);$('who').textContent=r.name;$('top').hidden=false;show('wait');poll();}
 $('joinBtn').onclick=join;$('nameIn').addEventListener('keydown',e=>{if(e.key==='Enter')join()});
-
 function show(w){['join','wait','game'].forEach(x=>$('s-'+x).hidden=x!==w)}
 
 /* ═════════ 상태 확인 (몇 초마다) ═════════ */
 async function poll(){
  clearTimeout(A.pollT);
- try{
-  const t0=Date.now();const r=await call('api_poll',A.name,A.token,A.activity);
-  A.offset=r.now-(t0+Date.now())/2;$('net').hidden=true;apply(r);
- }catch(e){
-  const m=errText(e);if(/다시 입장/.test(m)){store('poly_me',{});location.reload();return}
-  $('net').hidden=false;
- }
+ try{const t0=Date.now();const r=await call('api_poll',A.name,A.token,A.activity);A.offset=r.now-(t0+Date.now())/2;$('net').hidden=true;await apply(r)}
+ catch(e){const m=errText(e);if(/다시 입장/.test(m)){store('poly_me',{});location.reload();return}$('net').hidden=false}
  A.pollT=setTimeout(poll,3500+Math.random()*1000);
 }
-function apply(r){
- const s=r.state;const prev=A.state;A.state=s;A.lastPoll=r;
- if(r.me)A.me=r.me;
+async function apply(r){
+ const s=r.state;A.state=s;A.lastPoll=r;
+ if(r.me&&!A.busy)A.me=r.me;
+ if(r.cls){A.cls=r.cls;$('fClass').textContent=r.cls.shapes}
  $('pauseOv').hidden=s.status!=='paused';
  const live=s.status==='running'||s.status==='paused';
- if(live&&s.roundId!==A.round){startRound(s)}
- else if(!live&&A.round&&s.roundId===A.round&&s.status==='ended'){endRound(r)}
- else if(!live&&!A.round){waitScreen(r)}
+ if(live&&s.roundId!==A.round)await startRound(s);
+ else if(!live&&A.round&&s.roundId===A.round&&s.status==='ended')endRound(r);
+ else if(!live&&!A.round)waitScreen(r);
  updTop();
 }
 function waitScreen(r){
- show('wait');A.activity='대기';
- const s=r.state;
+ show('wait');A.activity='대기';const s=r.state;
  if(s.status==='ended'&&s.mode==='real'&&r.me){$('lastRes').hidden=false;$('waitTitle').textContent='지난 게임 결과';$('rScore').textContent=r.me.score;$('rSolved').textContent=r.me.solved;$('rRank').textContent=r.rank?r.rank+'등':'-';$('waitSub').textContent='다음 게임을 기다려요.'}
  else{$('lastRes').hidden=true;$('waitTitle').textContent='선생님이 게임을 시작하면 열려요';$('waitSub').textContent='화면을 켜 둔 채로 기다려요.'}
 }
 function endRound(r){
- A.round=null;cancelDrag();A.activity='게임 끝';
- show('wait');waitScreen(r);
- $('waitTitle').textContent=r.state.mode==='real'?'게임 끝! 🎉':'연습 끝!';
- if(r.state.mode!=='real'){$('lastRes').hidden=true;$('waitSub').textContent='완성한 퍼즐: '+(r.me?r.me.solved:0)+'개. 다음 게임을 기다려요.'}
+ A.round=null;cancelDrag();A.activity='게임 끝';show('wait');waitScreen(r);
+ $('waitTitle').textContent=r.state.mode==='real'?'게임 끝! 🎉':'활동 끝!';
+ if(r.state.mode!=='real'){$('lastRes').hidden=true;$('waitSub').textContent='수고했어요. 다음 활동을 기다려요.'}
 }
 function updTop(){
  const s=A.state;const live=s.status==='running'||s.status==='paused';
  $('modeChip').hidden=!live;$('scoreTxt').hidden=!(live&&s.mode==='real');$('timer').hidden=!live;
- if(live){$('modeChip').textContent=(s.mode==='real'?'실전':'연습');$('modeChip').className='chip '+(s.mode==='real'?'real':'prac');
-  $('scoreTxt').textContent=(A.me?A.me.score:0)+'점'}
+ if(live){$('modeChip').textContent=(s.mode==='real'?'실전':'연습');$('modeChip').className='chip '+(s.mode==='real'?'real':'prac');$('scoreTxt').textContent=(A.me?A.me.score:0)+'점'}
 }
 setInterval(()=>{const s=A.state;if(s.status!=='running'&&s.status!=='paused')return;
  const left=s.status==='paused'?s.remainMs:s.endAt-(Date.now()+A.offset);
  const sec=Math.max(0,Math.ceil(left/1000));$('timer').textContent=Math.floor(sec/60)+':'+String(sec%60).padStart(2,'0');
  $('timer').classList.toggle('low',sec<=30);
  if(sec===0&&s.status==='running'&&!A.zeroed){A.zeroed=true;setTimeout(poll,800)}},250);
+const canPlay=()=>A.state.status==='running';
 
 /* ═════════ 라운드 시작 ═════════ */
-function startRound(s){
- A.round=s.roundId;A.mode=s.mode;A.zeroed=false;A.doneP={};show('game');
+async function startRound(s){
+ A.round=s.roundId;A.mode=s.mode;A.zeroed=false;A.doneP={};A.find=[];A.dom={};A.fill={cur:0,saved:{},seen:{}};
+ try{const ms=await call('api_mystate',A.name,A.token);if(ms){A.find=ms.find||[];A.dom=ms.dom||{}}}catch(e){}
+ show('game');
  $('freeTabs').hidden=s.game!=='free';
- if(s.game==='free'){A.game='fill';document.querySelectorAll('#freeTabs .btn').forEach(b=>b.onclick=()=>{A.game=b.dataset.g;openPractice(0)})}
- else A.game=s.game;
- if(s.mode==='real'){$('plist').hidden=true;$('prog').hidden=false;openReal()}
- else{$('prog').hidden=true;openPractice(0)}
+ document.querySelectorAll('#freeTabs .btn').forEach(b=>b.onclick=()=>openGame(b.dataset.g));
+ openGame(s.game==='free'?'find':s.game);
 }
-const NAMES={fill:'그림 채우기',speed:'스피드 퍼즐',domino:'도미노 도전'};
-/* 실전: 모두 같은 순서 */
-function openReal(){
- const list=A.bank[A.game].real;const i=A.me?A.me.idx:0;
- $('progBar').style.width=(100*Math.min(i,list.length)/list.length)+'%';
- if(i>=list.length||(A.me&&A.me.done)){$('progTxt').textContent='다 풀었어요!';clearBoard();setMsg('🎉 모든 퍼즐을 다 풀었어요! 결과를 기다려요.','ok');A.activity='모두 완성';$('ctrl').innerHTML='';return}
- $('progTxt').textContent=(A.game==='speed'?'세트 ':'')+(i+1)+' / '+list.length;
- A.activity=NAMES[A.game]+' '+(i+1)+'번 풀이 중';
- loadPuzzle(list[i],{real:true,idx:i});
-}
-/* 연습: 골라서 */
-function openPractice(i){
- document.querySelectorAll('#freeTabs .btn').forEach(b=>b.classList.toggle('on',b.dataset.g===A.game));
- const pl=$('plist');pl.hidden=false;
- if(A.game==='domino'){pl.innerHTML=DOM_LIST.map((d,k)=>`<button class="btn${k===i?' on':''}${A.doneP['domino:'+d.id]?' done':''}" data-k="${k}">${d.title}</button>`).join('');
-  pl.querySelectorAll('.btn').forEach(b=>b.onclick=()=>openPractice(+b.dataset.k));loadDomino(i);return}
- const list=A.bank[A.game].practice;A.pIdx=i;
- pl.innerHTML=list.map((p,k)=>`<button class="btn${k===i?' on':''}${A.doneP[A.game+':'+k]?' done':''}" data-k="${k}">${p.title}</button>`).join('');
- pl.querySelectorAll('.btn').forEach(b=>b.onclick=()=>openPractice(+b.dataset.k));
- const on=pl.querySelector('.on');if(on)on.scrollIntoView({inline:'center',block:'nearest'});
- A.activity='연습: '+list[i].title;
- loadPuzzle(list[i],{real:false,idx:i});
+function openGame(g){
+ A.game=g;cancelDrag();
+ document.querySelectorAll('#freeTabs .btn').forEach(b=>b.classList.toggle('on',b.dataset.g===g));
+ ['find','dom','fill'].forEach(x=>$('g-'+x).hidden=x!==(g==='domino'?'dom':g));
+ if(g==='find')openFind();else if(g==='domino')openDom(DOMS[0].id);
+ else if(A.mode==='real')openReal(firstOpen());else openPractice(0);
 }
 
-/* ═════════ 퍼즐판 ═════════ */
+/* ═════════ 펜토미노 찾기 ═════════ */
+let FG=new Set();
+function openFind(){A.activity='펜토미노 찾기';drawFind();drawFindGal()}
+function fcs(){return Math.max(34,Math.min(56,Math.floor((Math.min(window.innerWidth-28,420))/6)))}
+function drawFind(){const s=fcs(),g=$('fGrid');g.style.width=6*s+'px';g.style.height=6*s+'px';let h='';
+ for(let r=0;r<6;r++)for(let c=0;c<6;c++)h+=`<button class="g6${FG.has(r+','+c)?' on':''}" data-k="${r},${c}" style="left:${c*s}px;top:${r*s}px;width:${s}px;height:${s}px" aria-label="${r+1}행 ${c+1}열"></button>`;
+ g.innerHTML=h;g.querySelectorAll('.g6').forEach(b=>b.onclick=()=>{if(!canPlay())return;const k=b.dataset.k;FG.has(k)?FG.delete(k):FG.add(k);b.classList.toggle('on')})}
+function drawFindGal(){const ok=A.find.filter(x=>x.ok),pend=A.find.filter(x=>!x.ok);
+ $('fMine').textContent=ok.length;
+ $('fGal').innerHTML=(ok.length||pend.length)?ok.map(x=>`<div class="it">${mini(x.cells,14)}</div>`).join('')+pend.map(x=>`<div class="it pend">${mini(x.cells,10,'#ddd')}<span>확인 중</span></div>`).join(''):'<span class="note">아직 없어요.</span>';
+ A.activity='펜토미노 찾기 ('+ok.length+'개 찾음)'}
+$('fClear').onclick=()=>{FG.clear();drawFind();$('fMsg').textContent='칸을 눌러 칠하고 [제출하기]를 눌러요.';$('fMsg').className='msg'};
+$('fSend').onclick=async()=>{
+ if(!canPlay())return;const cells=[...FG].map(k=>k.split(',').map(Number));
+ if(!cells.length){fMsg('먼저 칸을 칠해요.','bad');return}
+ const valid=isPento(cells);
+ if(valid&&A.find.some(x=>x.ok&&canon(x.cells)===canon(cells))){fMsg('이미 찾은 모양이에요! 돌리거나 뒤집으면 같아져요.','bad');return}
+ $('fSend').disabled=true;
+ try{const r=await call('api_find',A.name,A.token,{roundId:A.round,cells});
+  if(r.dup){fMsg('이미 찾은 모양이에요! 돌리거나 뒤집으면 같아져요.','bad')}
+  else{A.find.push({id:r.id,cells,ok:r.valid});
+   if(r.valid){fMsg(r.firstInClass?'🎉 새 모양! 우리 반에서 처음 찾았어요!':'🎉 새 모양을 찾았어요!','ok');toast('찾았다!',r.firstInClass?'반에서 처음!':'')}
+   else fMsg('선생님이 확인 중이에요.','');
+   FG.clear();drawFind();drawFindGal();poll()}
+ }catch(e){fMsg(errText(e),'bad')}finally{$('fSend').disabled=false}};
+function fMsg(t,c){$('fMsg').textContent=t;$('fMsg').className='msg'+(c?' '+c:'')}
+
+/* ═════════ 도미노 방법 모으기 ═════════ */
+const DOMS=[{id:'2x2',R:2,C:2},{id:'2x3',R:2,C:3},{id:'2x4',R:2,C:4},{id:'2x5',R:2,C:5},{id:'2x6',R:2,C:6},{id:'4x4',R:4,C:4}];
+let DM=null;
+const domKey=pairs=>pairs.map(p=>p.map(x=>x.join(',')).sort().join('-')).sort().join('|');
+const keyPairs=k=>k.split('|').map(p=>p.split('-').map(x=>x.split(',').map(Number)));
+function openDom(id){
+ const d=DOMS.find(x=>x.id===id);DM={d,own:{},doms:[],sel:null,colors:DM?DM.colors:true,nid:1};
+ $('dList').innerHTML=DOMS.map(x=>`<button class="btn${x.id===id?' on':''}" data-id="${x.id}">${x.R}×${x.C}${A.dom[x.id]&&A.dom[x.id].keys.length?' · '+A.dom[x.id].keys.length:''}</button>`).join('');
+ $('dList').querySelectorAll('.btn').forEach(b=>b.onclick=()=>openDom(b.dataset.id));
+ dMsg('이웃한 두 칸을 차례로 눌러 도미노를 놓아요. 다 덮으면 [기록하기]!');
+ $('dAskT').textContent=d.R+'×'+d.C+' 판을 덮는 방법은 모두';
+ const bd=A.dom[id];$('dAns').value=bd&&bd.ans!=null?bd.ans:'';$('dAnsNote').textContent=bd&&bd.ans!=null?'제출한 답: '+bd.ans+'가지 (바꿔서 다시 낼 수 있어요)':'';
+ drawDom();drawDomGal();
+}
+function dcs(){const d=DM.d;return Math.max(30,Math.floor(Math.min((Math.min(window.innerWidth-28,500))/d.C,window.innerHeight*0.32/d.R,64)))}
+function drawDom(){
+ const d=DM.d,b=$('dBoard'),s=dcs();b.style.width=d.C*s+'px';b.style.height=d.R*s+'px';b.className='board'+(DM.colors?'':' colors-off');let h='';
+ for(let r=0;r<d.R;r++)for(let c=0;c<d.C;c++)h+=`<button class="dbtn${(r+c)%2===0?' dark':''}${DM.sel&&DM.sel[0]===r&&DM.sel[1]===c?' sel':''}" data-r="${r}" data-c="${c}" style="left:${c*s}px;top:${r*s}px;width:${s}px;height:${s}px" aria-label="${r+1}행 ${c+1}열"></button>`;
+ const pal=['#ff9fb7','#8fd6cd','#ffd66b','#b9a3f0','#9cc8f5','#ffb48a','#b6e39a','#f5a3e0'];
+ DM.doms.forEach(x=>{const[[r1,c1],[r2,c2]]=x.cells,r=Math.min(r1,r2),c=Math.min(c1,c2),hz=r1===r2;h+=`<div class="dom" style="left:${c*s+3}px;top:${r*s+3}px;width:${(hz?2:1)*s-6}px;height:${(hz?1:2)*s-6}px;background:${pal[x.id%pal.length]}"></div>`});
+ b.innerHTML=h;b.querySelectorAll('.dbtn').forEach(x=>x.onclick=()=>tapDom(+x.dataset.r,+x.dataset.c));
+ $('dRec').disabled=Object.keys(DM.own).length!==d.R*d.C;
+}
+function domSvg(pairs,R,C,s){let h=`<svg width="${C*s+2}" height="${R*s+2}" viewBox="0 0 ${C*s+2} ${R*s+2}">`;
+ pairs.forEach(([a,b])=>{const r=Math.min(a[0],b[0]),c=Math.min(a[1],b[1]),hz=a[0]===b[0];h+=`<rect x="${1+c*s+1}" y="${1+r*s+1}" width="${(hz?2:1)*s-2}" height="${(hz?1:2)*s-2}" rx="2" fill="${hz?'#ffd66b':'#8fd6cd'}" stroke="#262222" stroke-width="1.3"/>`});return h+'</svg>'}
+function drawDomGal(){const d=DM.d,bd=A.dom[d.id],ks=bd?bd.keys:[];
+ $('dGalT').textContent='내가 찾은 '+d.R+'×'+d.C+' 방법: '+ks.length+'가지';
+ const s=d.R===4?9:11;$('dGal').innerHTML=ks.length?ks.map((k,i)=>`<div class="it">${domSvg(keyPairs(k),d.R,d.C,s)}<span>${i+1}</span></div>`).join(''):'<span class="note">판을 덮고 [기록하기]를 누르면 여기에 모여요.</span>';
+ A.activity='도미노 '+d.R+'×'+d.C+' ('+ks.length+'가지)'}
+function tapDom(r,c){
+ if(!DM||!canPlay())return;const k=r+','+c;
+ if(DM.own[k]){const id=DM.own[k];DM.doms=DM.doms.filter(x=>x.id!==id);Object.keys(DM.own).forEach(q=>{if(DM.own[q]===id)delete DM.own[q]});DM.sel=null;drawDom();return}
+ if(DM.sel&&Math.abs(DM.sel[0]-r)+Math.abs(DM.sel[1]-c)===1){const id=DM.nid++;DM.doms.push({id,cells:[DM.sel,[r,c]]});DM.own[DM.sel.join()]=id;DM.own[k]=id;DM.sel=null;drawDom();
+  if(!$('dRec').disabled)dMsg('다 덮었어요! [기록하기]를 눌러요.','ok');return}
+ DM.sel=[r,c];drawDom();
+}
+$('dCol').onclick=()=>{DM.colors=!DM.colors;$('dCol').classList.toggle('on',DM.colors);drawDom()};
+$('dClr').onclick=()=>{DM.own={};DM.doms=[];DM.sel=null;drawDom();dMsg('')};
+$('dRec').onclick=async()=>{
+ if(!canPlay())return;const pairs=DM.doms.map(x=>x.cells),k=domKey(pairs),d=DM.d;
+ const bd=A.dom[d.id]||(A.dom[d.id]={keys:[],ans:null});
+ if(bd.keys.includes(k)){dMsg('이미 찾은 방법이에요. 다른 방법으로 덮어 봐요!','bad');return}
+ $('dRec').disabled=true;
+ try{const r=await call('api_dom',A.name,A.token,{roundId:A.round,board:d.id,pairs});
+  if(r.dup)dMsg('이미 찾은 방법이에요. 다른 방법으로 덮어 봐요!','bad');
+  else{bd.keys.push(k);dMsg('🎉 새 방법! 지금까지 '+bd.keys.length+'가지','ok');toast('기록!',bd.keys.length+'번째 방법');
+   setTimeout(()=>{if(DM&&DM.d.id===d.id){DM.own={};DM.doms=[];DM.sel=null;drawDom()}},700);drawDomGal();
+   const b=document.querySelector('#dList .btn.on');if(b)b.textContent=d.R+'×'+d.C+' · '+bd.keys.length}
+ }catch(e){dMsg(errText(e),'bad');$('dRec').disabled=false}};
+$('dAnsBtn').onclick=async()=>{
+ if(!canPlay())return;const n=$('dAns').value;if(n===''){$('dAnsNote').textContent='수를 써 주세요.';return}
+ try{await call('api_dom_ans',A.name,A.token,{roundId:A.round,board:DM.d.id,n:+n});const bd=A.dom[DM.d.id]||(A.dom[DM.d.id]={keys:[],ans:null});bd.ans=+n;
+  $('dAnsNote').textContent='제출한 답: '+n+'가지 (바꿔서 다시 낼 수 있어요)'}catch(e){$('dAnsNote').textContent=errText(e)}};
+function dMsg(t,c){$('dMsg').textContent=t||'';$('dMsg').className='msg'+(c?' '+c:'')}
+
+/* ═════════ 그림 채우기 ═════════ */
+const realList=()=>A.bank.fill.real;
+const isDone=i=>!!(A.me&&A.me.done&&A.me.done[i]);
+const hintsUsed=i=>(A.me&&A.me.hintBy&&A.me.hintBy[i])||0;
+function firstOpen(){const L=realList();for(let i=0;i<L.length;i++)if(!isDone(i))return i;return 0}
+function drawNums(){const L=realList(),cur=A.fill.cur;
+ $('nums').innerHTML=L.map((p,i)=>`<button class="num${isDone(i)?' done':A.fill.seen[i]?' seen':''}${i===cur?' cur':''}" data-i="${i}">${i+1}</button>`).join('');
+ $('nums').querySelectorAll('.num').forEach(b=>b.onclick=()=>{if(!A.busy)openReal(+b.dataset.i)});
+ const on=$('nums').querySelector('.cur');if(on)on.scrollIntoView({inline:'center',block:'nearest'})}
+function savePuzzle(){if(P&&P.opt.real)A.fill.saved[P.opt.idx]=P.pieces.map(p=>({cells:p.cells,pos:p.pos}))}
+function openReal(i){
+ savePuzzle();const L=realList();A.fill.cur=i;A.fill.seen[i]=1;
+ $('plist').hidden=true;$('nums').hidden=false;drawNums();
+ const solvedN=L.filter((_,k)=>isDone(k)).length;
+ $('pTitle').textContent=(i+1)+'번 · '+L[i].title;
+ A.activity='그림 채우기 '+(i+1)+'번 (완성 '+solvedN+'/'+L.length+')';
+ loadPuzzle(L[i],{real:true,idx:i});
+ if(isDone(i)){P.solved=true;setMsg('✓ 이미 푼 문제예요. 다른 번호를 골라요.','ok')}
+ if(solvedN===L.length)setMsg('🎉 모든 문제를 다 풀었어요! 결과를 기다려요.','ok');
+}
+function openPractice(i){
+ const list=A.bank.fill.practice;$('nums').hidden=true;const pl=$('plist');pl.hidden=false;
+ pl.innerHTML=list.map((p,k)=>`<button class="btn${k===i?' on':''}${A.doneP['fill:'+k]?' done':''}" data-k="${k}">${p.title}</button>`).join('');
+ pl.querySelectorAll('.btn').forEach(b=>b.onclick=()=>openPractice(+b.dataset.k));
+ const on=pl.querySelector('.on');if(on)on.scrollIntoView({inline:'center',block:'nearest'});
+ $('pTitle').textContent='';A.activity='그림 채우기 연습: '+list[i].title;
+ loadPuzzle(list[i],{real:false,idx:i});
+}
 let P=null;
 function setMsg(t,c){$('msg').textContent=t||'';$('msg').className='msg'+(c?' '+c:'')}
-function clearBoard(){P=null;$('board').innerHTML='';$('board').style.width='0';$('board').style.height='0';$('tray').innerHTML='';$('tray').hidden=true}
 function loadPuzzle(puz,opt){
  cancelDrag();
  const target=new Set();let R=puz.rows.length,C=0;
  puz.rows.forEach((row,r)=>{C=Math.max(C,row.length);row.split('').forEach((ch,c)=>{if(ch==='X')target.add(r+','+c)})});
- P={puz,opt,target,R,C,sel:null,solved:false,colors:false,skipArm:false,
-  pieces:puz.pieces.map((n,k)=>({id:k,name:n,cells:normC(A.bank.pieces[n]),pos:null}))};
- $('tray').hidden=false;
- setMsg(puz.impossible?'이 판을 다 채울 수 있을까요? 안 된다면 이유를 생각해 봐요.':(opt.real?'빈칸을 조각으로 빈틈없이 채워요!':'조각을 끌어다 판을 채워요.'));
+ P={puz,opt,target,R,C,sel:null,solved:false,colors:false,pieces:puz.pieces.map((n,k)=>({id:k,name:n,cells:normC(A.bank.pieces[n]),pos:null}))};
+ const sv=opt.real&&A.fill.saved[opt.idx];if(sv)sv.forEach((x,k)=>{if(P.pieces[k]){P.pieces[k].cells=x.cells;P.pieces[k].pos=x.pos}});
+ setMsg(puz.impossible?'이 판을 다 채울 수 있을까요? 안 된다면 이유를 생각해 봐요.':'조각을 끌어다 그림을 빈틈없이 채워요.');
  const c=$('ctrl');
- if(opt.real){c.innerHTML=`<button class="btn" id="bRot">🔄 돌리기</button><button class="btn" id="bFlip">↔️ 뒤집기</button><button class="btn" id="bReset">처음부터</button><button class="btn warn" id="bSkip">건너뛰기</button>`}
+ if(opt.real){const u=hintsUsed(opt.idx),left=2-u;
+  c.innerHTML=`<button class="btn" id="bRot">🔄 돌리기</button><button class="btn" id="bFlip">↔️ 뒤집기</button><button class="btn" id="bReset">처음부터</button>`+
+   `<button class="btn" id="bHint"${puz.noHint||left<=0?' disabled':''}>힌트 ${puz.noHint?'없음':left+'번'}<span class="hintc">${puz.noHint?'이 문제는 금지':'1번에 −3점'}</span></button>`+
+   `<button class="btn pri" id="bNext" style="grid-column:span 4">다음 문제 →</button>`}
  else{c.innerHTML=`<button class="btn" id="bRot">🔄 돌리기</button><button class="btn" id="bFlip">↔️ 뒤집기</button><button class="btn" id="bReset">처음부터</button>`+
   (puz.impossible?`<button class="btn on" id="bColor">색칠 보기</button><button class="btn pri wide" id="bImp">불가능해요!</button>`:`<button class="btn" id="bHint">힌트</button>`)+
-  `<button class="btn${puz.impossible?' wide':''}" id="bNext">다음 퍼즐 →</button>`}
+  `<button class="btn${puz.impossible?' wide':''}" id="bNext"${puz.impossible?'':' style="grid-column:span 4"'}>다음 그림 →</button>`}
  $('bRot').onclick=()=>{if(P.sel!==null)turn(P.sel,rot);else setMsg('먼저 조각을 하나 톡 눌러 골라요.')};
  $('bFlip').onclick=()=>{if(P.sel!==null)turn(P.sel,flip);else setMsg('먼저 조각을 하나 톡 눌러 골라요.')};
  $('bReset').onclick=()=>{if(P.solved)return;P.pieces.forEach(p=>p.pos=null);P.sel=null;render()};
- if($('bSkip'))$('bSkip').onclick=skip;
- if($('bHint'))$('bHint').onclick=hint;
- if($('bNext'))$('bNext').onclick=()=>{const L=A.bank[A.game].practice;openPractice((P.opt.idx+1)%L.length)};
+ if($('bHint'))$('bHint').onclick=opt.real?realHint:hint;
+ $('bNext').onclick=()=>{if(opt.real){const L=realList();for(let k=1;k<=L.length;k++){const j=(opt.idx+k)%L.length;if(!isDone(j))return openReal(j)}}else{const L=A.bank.fill.practice;openPractice((P.opt.idx+1)%L.length)}};
  if($('bImp'))$('bImp').onclick=claimImpossible;
  if($('bColor'))$('bColor').onclick=()=>{P.colors=!P.colors;$('bColor').classList.toggle('on',!P.colors);render()};
- $('gnote').textContent=opt.real?'조각을 톡 누르면 돌아가요. 판 밖으로 끌어내면 빠져요.':'조각을 톡 누르면 돌아가요. 판 밖으로 끌어내면 빠져요.';
+ $('gnote').textContent='조각을 톡 누르면 돌아가요. 판 밖으로 끌어내면 빠져요.'+(opt.real?' 위 번호를 눌러 다른 문제로 갔다 와도 놓은 조각은 그대로예요.':'');
  render();
 }
-function size(){
- const W=Math.min(window.innerWidth-28,532);
- const H=Math.max(180,window.innerHeight*0.40);
- return Math.max(18,Math.floor(Math.min(W/P.C,H/P.R,52)));
-}
+function size(){const W=Math.min(window.innerWidth-28,532);const H=Math.max(180,window.innerHeight*0.40);return Math.max(16,Math.floor(Math.min(W/P.C,H/P.R,52)))}
 function occupied(except){const m=new Map();P.pieces.forEach(p=>{if(p.pos&&p.id!==except)p.cells.forEach(([r,c])=>m.set((r+p.pos[0])+','+(c+p.pos[1]),p.id))});return m}
 function fits(cells,pos,except){const occ=occupied(except);return cells.every(([r,c])=>{const k=(r+pos[0])+','+(c+pos[1]);return P.target.has(k)&&!occ.has(k)})}
 function pieceEl(p,s){const[h,w]=dims(p.cells);const el=document.createElement('div');el.className='pc'+(P&&P.sel===p.id?' sel':'');el.dataset.id=p.id;
@@ -309,12 +446,9 @@ function render(){
  if(!P)return;const s=size(),b=$('board');P.cs=s;
  b.style.width=P.C*s+'px';b.style.height=P.R*s+'px';b.className='board'+(P.colors?'':' colors-off');
  let h='';P.target.forEach(k=>{const[r,c]=k.split(',').map(Number);h+=`<div class="bc${(r+c)%2===0?' dark':''}" data-k="${k}" style="left:${c*s}px;top:${r*s}px;width:${s}px;height:${s}px"></div>`});
- b.innerHTML=h;
- const tray=$('tray');tray.innerHTML='';const ts=Math.max(16,Math.round(s*0.62));
- P.pieces.forEach(p=>{
-  if(p.pos){const el=pieceEl(p,s);el.style.left=p.pos[1]*s+'px';el.style.top=p.pos[0]*s+'px';b.appendChild(el)}
-  else{const slot=document.createElement('div');slot.className='slot';const el=pieceEl(p,ts);el.style.position='relative';slot.appendChild(el);tray.appendChild(slot)}
- });
+ b.innerHTML=h;const tray=$('tray');tray.innerHTML='';const ts=Math.max(14,Math.round(s*0.62));
+ P.pieces.forEach(p=>{if(p.pos){const el=pieceEl(p,s);el.style.left=p.pos[1]*s+'px';el.style.top=p.pos[0]*s+'px';b.appendChild(el)}
+  else{const slot=document.createElement('div');slot.className='slot';const el=pieceEl(p,ts);el.style.position='relative';slot.appendChild(el);tray.appendChild(slot)}});
  if(!P.pieces.some(p=>!p.pos))tray.innerHTML='<span class="note">조각을 모두 놓았어요</span>';
 }
 function turn(id,fn){if(P.solved)return;const p=P.pieces[id];const nc=fn(p.cells);
@@ -324,127 +458,75 @@ function turn(id,fn){if(P.solved)return;const p=P.pieces[id];const nc=fn(p.cells
 let D=null;
 function cancelDrag(){if(D&&D.ghost)D.ghost.remove();D=null}
 document.addEventListener('pointerdown',e=>{
- const el=e.target.closest('.pc');if(!el||!P||P.solved||A.busy)return;
- if(A.state.status!=='running')return;
+ const el=e.target.closest('.pc');if(!el||!P||P.solved||A.busy||!canPlay())return;
  e.preventDefault();const id=+el.dataset.id,p=P.pieces[id];const rc=el.getBoundingClientRect();
- const sc=rc.width/dims(p.cells)[1];
- let gr=Math.floor((e.clientY-rc.top)/sc),gc=Math.floor((e.clientX-rc.left)/sc);
- // 손가락 아래 칸이 비어 있으면 가장 가까운 칸으로
+ const sc=rc.width/dims(p.cells)[1];const gr=Math.floor((e.clientY-rc.top)/sc),gc=Math.floor((e.clientX-rc.left)/sc);
  let best=p.cells[0],bd=1e9;p.cells.forEach(([r,c])=>{const d=(r-gr)**2+(c-gc)**2;if(d<bd){bd=d;best=[r,c]}});
  D={id,x:e.clientX,y:e.clientY,el,gr:best[0],gc:best[1],drag:false,lift:e.pointerType==='touch'?-P.cs*0.9:0};
 });
 document.addEventListener('pointermove',e=>{
  if(!D)return;
- if(!D.drag){if(Math.hypot(e.clientX-D.x,e.clientY-D.y)<7)return;D.drag=true;P.sel=D.id;
-  const p=P.pieces[D.id];D.ghost=pieceEl(p,P.cs);D.ghost.classList.add('ghost');document.body.appendChild(D.ghost);D.el.classList.add('lift')}
- e.preventDefault();
- const cs=P.cs,gx=e.clientX,gy=e.clientY+D.lift;
+ if(!D.drag){if(Math.hypot(e.clientX-D.x,e.clientY-D.y)<7)return;D.drag=true;P.sel=D.id;const p=P.pieces[D.id];D.ghost=pieceEl(p,P.cs);D.ghost.classList.add('ghost');document.body.appendChild(D.ghost);D.el.classList.add('lift')}
+ e.preventDefault();const cs=P.cs,gx=e.clientX,gy=e.clientY+D.lift;
  D.ghost.style.left=(gx-(D.gc+.5)*cs)+'px';D.ghost.style.top=(gy-(D.gr+.5)*cs)+'px';
- const br=$('board').getBoundingClientRect();
- const row=Math.floor((gy-br.top)/cs),col=Math.floor((gx-br.left)/cs);D.pos=[row-D.gr,col-D.gc];
+ const br=$('board').getBoundingClientRect();const row=Math.floor((gy-br.top)/cs),col=Math.floor((gx-br.left)/cs);D.pos=[row-D.gr,col-D.gc];
  const p=P.pieces[D.id];const ok=fits(p.cells,D.pos,D.id);
  document.querySelectorAll('.bc.pv-ok,.bc.pv-bad').forEach(x=>x.classList.remove('pv-ok','pv-bad'));
  p.cells.forEach(([r,c])=>{const q=document.querySelector(`.bc[data-k="${r+D.pos[0]},${c+D.pos[1]}"]`);if(q)q.classList.add(ok?'pv-ok':'pv-bad')});
 },{passive:false});
-document.addEventListener('pointerup',e=>{
+document.addEventListener('pointerup',()=>{
  if(!D)return;const d=D;D=null;
  if(!d.drag){turn(d.id,rot);return}
  d.ghost.remove();const p=P.pieces[d.id];
- if(d.pos&&fits(p.cells,d.pos,d.id)){p.pos=d.pos;setMsg('')}else{p.pos=null}
+ if(d.pos&&fits(p.cells,d.pos,d.id)){p.pos=d.pos;setMsg('')}else p.pos=null;
  P.sel=d.id;render();check();
 });
 document.addEventListener('pointercancel',()=>{if(D){if(D.ghost)D.ghost.remove();D=null;render()}});
-addEventListener('resize',()=>{if(P)render();else if(DM)drawDomino()});
-
+addEventListener('resize',()=>{if(A.game==='fill'&&P)render();else if(A.game==='domino'&&DM)drawDom();else if(A.game==='find')drawFind()});
+const placements=()=>P.pieces.filter(p=>p.pos).map(p=>({p:p.name,cells:p.cells.map(([r,c])=>[r+p.pos[0],c+p.pos[1]])}));
 function check(){
- if(!P||P.solved||P.puz.impossible)return;
- if(P.pieces.some(p=>!p.pos))return;
- P.solved=true;const placements=P.pieces.map(p=>({p:p.name,cells:p.cells.map(([r,c])=>[r+p.pos[0],c+p.pos[1]])}));
- if(P.opt.real)submitReal(placements);else submitPractice({game:A.game,puzzle:P.opt.idx,placements});
+ if(!P||P.solved||P.puz.impossible)return;if(P.pieces.some(p=>!p.pos))return;
+ P.solved=true;if(P.opt.real)submitReal();else submitPractice();
 }
-async function submitReal(placements){
- A.busy=true;setMsg('확인하는 중…');
- try{const r=await call('api_submit',A.name,A.token,{roundId:A.round,game:A.game,puzzle:P.opt.idx,placements});
-  A.me=r.me;updTop();toast('+'+r.points+'점',r.bonus?('빠르기 보너스 +'+r.bonus):'');
-  setTimeout(()=>{A.busy=false;openReal()},1100);
+async function submitReal(){
+ A.busy=true;setMsg('확인하는 중…');const i=P.opt.idx;
+ try{const r=await call('api_submit',A.name,A.token,{roundId:A.round,game:'fill',puzzle:i,placements:placements()});
+  A.me=r.me;savePuzzle();updTop();toast('+'+r.points+'점',r.hints?('힌트 '+r.hints+'번 사용'):'');drawNums();
+  setTimeout(()=>{A.busy=false;const L=realList();for(let k=1;k<=L.length;k++){const j=(i+k)%L.length;if(!isDone(j))return openReal(j)}openReal(i)},1100);
  }catch(e){A.busy=false;P.solved=false;setMsg(errText(e),'bad')}
 }
-async function skip(){
- if(!P.skipArm){P.skipArm=true;$('bSkip').textContent='한 번 더 누르면 건너뛰어요';setTimeout(()=>{if(P&&$('bSkip')){P.skipArm=false;$('bSkip').textContent='건너뛰기'}},2500);return}
- A.busy=true;
- try{const r=await call('api_submit',A.name,A.token,{roundId:A.round,game:A.game,puzzle:P.opt.idx,skip:true});A.me=r.me;A.busy=false;openReal()}
- catch(e){A.busy=false;setMsg(errText(e),'bad')}
-}
-async function submitPractice(data){
- setMsg('🎉 완성!','ok');toast('완성!','다음 퍼즐에 도전해 봐요');
- const key=data.game+':'+(data.game==='domino'?data.board:data.puzzle);A.doneP[key]=1;
+async function submitPractice(){
+ setMsg('🎉 완성!','ok');toast('완성!','다음 그림에 도전해 봐요');A.doneP['fill:'+P.opt.idx]=1;
  const b=document.querySelector('#plist .btn.on');if(b)b.classList.add('done');
- try{await call('api_submit',A.name,A.token,Object.assign({roundId:A.round},data))}catch(e){}
+ try{await call('api_submit',A.name,A.token,{roundId:A.round,game:'fill',puzzle:P.opt.idx,placements:placements()})}catch(e){}
+}
+function placeHint(s){
+ const want=key(s.cells),pos=[Math.min(...s.cells.map(x=>x[0])),Math.min(...s.cells.map(x=>x[1]))];
+ const p=P.pieces.find(q=>q.name===s.p&&!(q.pos&&q.pos[0]===pos[0]&&q.pos[1]===pos[1]&&key(q.cells)===want));if(!p)return;
+ const tgt=new Set(s.cells.map(x=>x.join()));
+ P.pieces.forEach(q=>{if(q.pos&&q.id!==p.id&&q.cells.some(([r,c])=>tgt.has((r+q.pos[0])+','+(c+q.pos[1]))))q.pos=null});
+ p.cells=normC(s.cells);p.pos=pos;P.sel=p.id;render();
 }
 function hint(){
  if(!P||P.solved)return;const sol=P.puz.sol;if(!sol||!sol.length)return;
- // 아직 바르게 놓이지 않은 조각 하나를 정답 자리에
- const used=new Set();
- for(const s of sol){
-  const want=normC(s.cells).map(x=>x.join()).join(';');const pos=[Math.min(...s.cells.map(x=>x[0])),Math.min(...s.cells.map(x=>x[1]))];
-  const right=P.pieces.find(p=>p.name===s.p&&p.pos&&p.pos[0]===pos[0]&&p.pos[1]===pos[1]&&p.cells.map(x=>x.join()).join(';')===want&&!used.has(p.id));
-  if(right){used.add(right.id);continue}
-  const p=P.pieces.find(q=>q.name===s.p&&!used.has(q.id));if(!p)continue;
-  const tgt=new Set(s.cells.map(x=>x.join()));
-  P.pieces.forEach(q=>{if(q.pos&&q.id!==p.id&&q.cells.some(([r,c])=>tgt.has((r+q.pos[0])+','+(c+q.pos[1]))))q.pos=null});
-  p.cells=normC(s.cells);p.pos=pos;P.sel=p.id;setMsg('힌트: 한 조각을 제자리에 놓았어요.');render();check();return
- }
+ const placed=new Set(placements().map(x=>x.p+'|'+key(x.cells)+'|'+Math.min(...x.cells.map(y=>y[0]))+','+Math.min(...x.cells.map(y=>y[1]))));
+ const s=sol.find(x=>!placed.has(x.p+'|'+key(x.cells)+'|'+Math.min(...x.cells.map(y=>y[0]))+','+Math.min(...x.cells.map(y=>y[1]))));
+ if(s){placeHint(s);setMsg('힌트: 한 조각을 제자리에 놓았어요.');check()}
+}
+async function realHint(){
+ if(!P||P.solved||A.busy)return;A.busy=true;$('bHint').disabled=true;
+ try{const r=await call('api_hint',A.name,A.token,{roundId:A.round,puzzle:P.opt.idx,placements:placements()});
+  A.me.hintBy=A.me.hintBy||{};A.me.hintBy[P.opt.idx]=r.used;placeHint(r.piece);
+  setMsg('힌트: 한 조각을 제자리에 놓았어요. (이 문제 −'+(3*r.used)+'점)');
+  $('bHint').innerHTML='힌트 '+r.left+'번<span class="hintc">1번에 −3점</span>';$('bHint').disabled=r.left<=0;A.busy=false;check()}
+ catch(e){A.busy=false;setMsg(errText(e),'bad');$('bHint').disabled=false}
 }
 function claimImpossible(){
  setMsg('맞아요! 체스판처럼 색칠하면 T자 조각만 회색:흰색이 3:1이라 짝이 안 맞아요.','ok');
  P.colors=true;render();if($('bColor'))$('bColor').classList.remove('on');
- const key=A.game+':'+P.opt.idx+':x';if(!A.doneP[key]){A.doneP[key]=1;call('api_submit',A.name,A.token,{roundId:A.round,game:A.game,puzzle:P.opt.idx,impossible:true}).catch(()=>{})}
+ const k='fill:'+P.opt.idx+':x';if(!A.doneP[k]){A.doneP[k]=1;call('api_submit',A.name,A.token,{roundId:A.round,game:'fill',puzzle:P.opt.idx,impossible:true}).catch(()=>{})}
 }
 function toast(t,s){const d=document.createElement('div');d.className='toast';d.innerHTML=t+(s?'<small>'+s+'</small>':'');document.body.appendChild(d);setTimeout(()=>d.remove(),1200)}
-
-/* ═════════ 도미노 도전 (연습 전용) ═════════ */
-const DOM_LIST=[{id:'2x4',title:'2×4',R:2,C:4,gone:[]},{id:'2x6',title:'2×6',R:2,C:6,gone:[]},{id:'4x4',title:'4×4',R:4,C:4,gone:[]},
- {id:'5x5',title:'5×5',R:5,C:5,gone:[],imp:'25칸은 홀수예요. 도미노는 늘 2칸씩 덮어요.'},
- {id:'6x6c',title:'두 모서리 뺀 6×6',R:6,C:6,gone:[[0,0],[5,5]],imp:'도미노는 늘 회색 1칸+흰색 1칸을 덮는데, 이 판은 회색 16칸, 흰색 18칸이에요.'}];
-let DM=null;
-function loadDomino(k){
- P=null;cancelDrag();const d=DOM_LIST[k];
- DM={d,k,own:{},doms:[],sel:null,colors:true,done:false,nid:1};
- A.activity='연습: 도미노 '+d.title;
- $('tray').hidden=true;
- setMsg('이웃한 두 칸을 차례로 눌러 도미노를 놓아요.');
- $('ctrl').innerHTML=`<button class="btn on" id="dCol">색칠 보기</button><button class="btn" id="dClr">처음부터</button><button class="btn pri wide" id="dImp">불가능해요!</button>`;
- $('dCol').onclick=()=>{DM.colors=!DM.colors;$('dCol').classList.toggle('on',DM.colors);drawDomino()};
- $('dClr').onclick=()=>{DM.own={};DM.doms=[];DM.sel=null;DM.done=false;drawDomino();setMsg('')};
- $('dImp').onclick=()=>{if(d.imp){setMsg('정답! '+d.imp,'ok');if(!A.doneP['domino:'+d.id+':x']){A.doneP['domino:'+d.id+':x']=1;call('api_submit',A.name,A.token,{roundId:A.round,game:'domino',board:d.id,impossible:true}).catch(()=>{})}}
-  else setMsg('이 판은 덮을 수 있어요! 다시 해 봐요.','bad')};
- $('gnote').textContent='놓인 도미노를 누르면 다시 빠져요.';
- drawDomino();
-}
-function drawDomino(){
- if(!DM)return;const d=DM.d,b=$('board');const s=Math.max(26,Math.floor(Math.min((Math.min(window.innerWidth-28,532))/d.C,window.innerHeight*0.45/d.R,60)));
- b.style.width=d.C*s+'px';b.style.height=d.R*s+'px';b.className='board'+(DM.colors?'':' colors-off');
- const gone=new Set(d.gone.map(x=>x.join()));let h='';
- for(let r=0;r<d.R;r++)for(let c=0;c<d.C;c++){const g=gone.has(r+','+c);
-  h+=`<button class="dbtn${(r+c)%2===0?' dark':''}${g?' gone':''}${DM.sel&&DM.sel[0]===r&&DM.sel[1]===c?' sel':''}" data-r="${r}" data-c="${c}" style="left:${c*s}px;top:${r*s}px;width:${s}px;height:${s}px" aria-label="${r+1}행 ${c+1}열"></button>`}
- const pal=['#ff9fb7','#8fd6cd','#ffd66b','#b9a3f0','#9cc8f5','#ffb48a','#b6e39a'];
- DM.doms.forEach(x=>{const[[r1,c1],[r2,c2]]=x.cells,r=Math.min(r1,r2),c=Math.min(c1,c2),hz=r1===r2;
-  h+=`<div class="dom" style="left:${c*s+3}px;top:${r*s+3}px;width:${(hz?2:1)*s-6}px;height:${(hz?1:2)*s-6}px;background:${pal[x.id%pal.length]}"></div>`});
- b.innerHTML=h;
- b.querySelectorAll('.dbtn').forEach(x=>x.onclick=()=>tapDomino(+x.dataset.r,+x.dataset.c));
-}
-function tapDomino(r,c){
- if(!DM||DM.done||A.state.status!=='running')return;const d=DM.d,k=r+','+c;
- if(d.gone.some(x=>x[0]===r&&x[1]===c))return;
- if(DM.own[k]){const id=DM.own[k];DM.doms=DM.doms.filter(x=>x.id!==id);Object.keys(DM.own).forEach(q=>{if(DM.own[q]===id)delete DM.own[q]});DM.sel=null;drawDomino();return}
- if(DM.sel&&Math.abs(DM.sel[0]-r)+Math.abs(DM.sel[1]-c)===1){const id=DM.nid++;DM.doms.push({id,cells:[DM.sel,[r,c]]});DM.own[DM.sel.join()]=id;DM.own[k]=id;DM.sel=null;drawDomino();
-  if(Object.keys(DM.own).length===d.R*d.C-d.gone.length){DM.done=true;A.doneP['domino:'+d.id]=1;const bb=document.querySelector('#plist .btn.on');if(bb)bb.classList.add('done');
-   setMsg('🎉 다 덮었어요! 도미노 '+DM.doms.length+'개','ok');toast('완성!','');call('api_submit',A.name,A.token,{roundId:A.round,game:'domino',board:d.id,pairs:DM.doms.map(x=>x.cells)}).catch(()=>{})}
-  return}
- DM.sel=[r,c];drawDomino();
-}
-/* 퍼즐을 열 때 도미노 상태 정리 */
-const _lp=loadPuzzle;loadPuzzle=function(p,o){DM=null;return _lp(p,o)};
 
 boot();
 </script>
