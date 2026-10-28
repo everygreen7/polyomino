@@ -1,0 +1,248 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<base target="_top">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>폴리오미노 교사 화면</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Jua&family=Noto+Sans+KR:wght@400;500;700;900&display=swap">
+<style>
+:root{--paper:#fbf9f4;--grid:rgba(96,128,170,.11);--ink:#262222;--sub:#5b524e;--mute:#8a807a;--line:#d8d0c3;
+ --acc:#d6336c;--acc-soft:#fde3ec;--teal:#178f86;--teal-soft:#dff3f0;--sun:#ffd65a;--card:#fff;--ok:#2f8a5a;--bad:#c2410c;
+ --gold:#f2b705;--silver:#a8b0b8;--bronze:#c98a4b;
+ --display:'Jua','Noto Sans KR',sans-serif;--body:'Noto Sans KR','Apple SD Gothic Neo','Malgun Gothic',sans-serif}
+*{box-sizing:border-box}[hidden]{display:none!important}
+html,body{margin:0;background:var(--paper);color:var(--ink);font-family:var(--body);font-size:15px}
+body{background-image:linear-gradient(var(--grid) 1px,transparent 1px),linear-gradient(90deg,var(--grid) 1px,transparent 1px);background-size:26px 26px}
+button,input,select{font-family:var(--body);color:var(--ink)}
+.wrap{max-width:1280px;margin:0 auto;padding:16px 18px 40px}
+h1{font-family:var(--display);font-weight:400;font-size:30px;margin:0}
+h1 span{background:linear-gradient(transparent 58%,var(--sun) 58%,var(--sun) 92%,transparent 92%);padding:0 3px}
+h2{font-family:var(--display);font-weight:400;font-size:22px;margin:0 0 10px}
+.card{background:var(--card);border:2.5px solid var(--ink);border-radius:18px 10px 20px 12px;padding:16px}
+.btn{font-size:15px;font-weight:700;border:2.5px solid var(--ink);border-radius:12px;background:#fff;padding:10px 14px;cursor:pointer}
+.btn:hover{background:#f6f1ea}.btn.pri{background:var(--acc);border-color:var(--acc);color:#fff}.btn.pri:hover{background:#b0285a}
+.btn.on{background:var(--teal-soft);border-color:var(--teal)}.btn.danger{border-color:var(--bad);color:var(--bad)}
+.btn:disabled{opacity:.4;cursor:default}
+.btn:focus-visible{outline:3px solid var(--teal);outline-offset:2px}
+.head{display:flex;flex-wrap:wrap;gap:12px;align-items:center;justify-content:space-between;margin-bottom:14px}
+.pill{font-weight:700;padding:6px 12px;border-radius:999px;background:#fff;border:2px solid var(--line)}
+.pill b{color:var(--ok)}
+.grid{display:grid;grid-template-columns:minmax(0,1fr) 340px;gap:16px;align-items:start}
+@media(max-width:980px){.grid{grid-template-columns:minmax(0,1fr)}}
+.games{display:grid;grid-template-columns:repeat(4,1fr);gap:8px}
+@media(max-width:640px){.games{grid-template-columns:repeat(2,1fr)}}
+.g{border:2.5px solid var(--line);border-radius:14px;background:#fff;padding:10px;cursor:pointer;text-align:left}
+.g b{display:block;font-family:var(--display);font-weight:400;font-size:19px}.g span{font-size:12px;color:var(--sub)}
+.g.on{border-color:var(--acc);background:var(--acc-soft)}
+.row{display:flex;flex-wrap:wrap;gap:10px;align-items:center;margin-top:12px}
+.lab{font-weight:700;color:var(--sub);font-size:14px;min-width:64px}
+.seg{display:flex;border:2.5px solid var(--ink);border-radius:12px;overflow:hidden}
+.seg button{border:0;padding:9px 16px;font-weight:700;background:#fff;cursor:pointer}
+.seg button.on{background:var(--ink);color:#fff}.seg button:disabled{opacity:.35}
+.num{width:70px;font-size:20px;font-weight:800;text-align:center;border:2.5px solid var(--ink);border-radius:12px;padding:6px}
+.live{display:flex;flex-wrap:wrap;align-items:center;gap:16px}
+.clock{font:400 64px/1 var(--display);font-variant-numeric:tabular-nums}
+.clock.low{color:var(--acc)}
+.lbl{font-family:var(--display);font-size:22px}
+.badge{font-size:13px;font-weight:800;padding:4px 10px;border-radius:999px;color:#fff;background:var(--ink)}
+.badge.real{background:var(--acc)}.badge.prac{background:var(--teal)}.badge.paused{background:#e08a00}.badge.ended{background:var(--mute)}
+.confirm{display:inline-flex;gap:6px;align-items:center;font-weight:700;color:var(--bad)}
+table{width:100%;border-collapse:collapse}
+th{font-size:12px;color:var(--mute);text-align:left;padding:6px 8px;border-bottom:2.5px solid var(--ink);white-space:nowrap}
+td{padding:8px;border-bottom:1.5px solid var(--line);vertical-align:middle}
+td.n{font-variant-numeric:tabular-nums;text-align:right;font-weight:800}
+.rk{display:inline-flex;width:30px;height:30px;border-radius:50%;align-items:center;justify-content:center;font-weight:900;background:#efe9df}
+.rk.r1{background:var(--gold);color:#fff}.rk.r2{background:var(--silver);color:#fff}.rk.r3{background:var(--bronze);color:#fff}
+.dot{display:inline-block;width:10px;height:10px;border-radius:50%;background:#cfc8bd;margin-right:6px}.dot.on{background:#2fbf71}
+.nm{font-weight:800;font-size:16px}
+.bar{display:inline-block;width:110px;height:9px;border-radius:9px;background:#ece6db;vertical-align:middle;overflow:hidden;margin-left:6px}
+.bar i{display:block;height:100%;background:var(--acc)}
+.act{font-size:13px;color:var(--sub)}
+.x{border:0;background:none;color:var(--mute);cursor:pointer;font-size:16px}
+.tblwrap{overflow-x:auto}
+.side{display:flex;flex-direction:column;gap:16px}
+.tot li{display:flex;justify-content:space-between;gap:8px;padding:6px 0;border-bottom:1.5px dashed var(--line);font-weight:700}
+.tot ol{list-style:none;margin:0;padding:0}
+.msg{font-weight:700;min-height:1.4em;color:var(--bad);margin-top:8px}
+.big table td{font-size:22px;padding:12px}.big .nm{font-size:26px}.big .rk{width:44px;height:44px;font-size:22px}.big .clock{font-size:96px}
+.big .hide-big{display:none}
+.empty{color:var(--mute);text-align:center;padding:30px}
+</style>
+</head>
+<body>
+<div class="wrap">
+ <section id="login" class="card" style="max-width:380px;margin:60px auto">
+  <h1><span>교사</span> 화면</h1>
+  <p style="color:var(--sub)">교사 비밀번호를 입력하세요.</p>
+  <input id="pw" type="password" class="num" style="width:100%;text-align:left" autocomplete="off">
+  <button class="btn pri" id="loginBtn" style="width:100%;margin-top:10px">들어가기</button>
+  <div class="msg" id="loginMsg"></div>
+ </section>
+
+ <section id="dash" hidden>
+  <div class="head">
+   <h1><span>폴리오미노</span> 게임 운영</h1>
+   <div class="row" style="margin:0">
+    <span class="pill">접속 <b id="cOn">0</b> / 입장 <span id="cJoin">0</span>명</span>
+    <button class="btn" id="bigBtn">크게 보기</button>
+   </div>
+  </div>
+  <div class="grid">
+   <div class="side" style="gap:16px">
+    <!-- 게임 설정 -->
+    <div class="card hide-big" id="setup">
+     <h2>새 게임 시작</h2>
+     <div class="games" id="games">
+      <button class="g on" data-g="fill"><b>그림 채우기</b><span>칠교처럼 그림을 조각으로 채우기</span></button>
+      <button class="g" data-g="speed"><b>스피드 퍼즐</b><span>우봉고 방식, 빨리 채우기</span></button>
+      <button class="g" data-g="domino"><b>도미노 도전</b><span>연습 전용 · 덮을 수 있을까?</span></button>
+      <button class="g" data-g="free"><b>자유 연습</b><span>세 게임을 마음대로</span></button>
+     </div>
+     <div class="row"><span class="lab">모드</span>
+      <div class="seg" id="modeSeg"><button data-m="practice" class="on">연습</button><button data-m="real">실전 (점수)</button></div>
+      <span class="act" id="modeNote"></span></div>
+     <div class="row"><span class="lab">시간</span>
+      <button class="btn" data-d="-1">−</button><input id="mins" class="num" type="number" min="1" max="60" value="5"><button class="btn" data-d="1">+</button><span>분</span>
+      <span style="flex:1"></span><button class="btn pri" id="startBtn" style="font-size:18px;padding:12px 26px">▶ 게임 시작</button></div>
+    </div>
+    <!-- 진행 중 -->
+    <div class="card" id="running" hidden>
+     <div class="live">
+      <div style="flex:1;min-width:220px"><span class="badge" id="stBadge"></span> <span class="badge" id="mdBadge"></span>
+       <div class="lbl" id="stLabel" style="margin-top:6px"></div></div>
+      <div class="clock" id="clock">0:00</div>
+     </div>
+     <div class="row hide-big">
+      <button class="btn" id="pauseBtn">⏸ 일시정지</button>
+      <button class="btn" id="addBtn">+1분</button>
+      <span style="flex:1"></span>
+      <span id="endWrap"><button class="btn danger" id="endBtn">■ 지금 끝내기</button></span>
+     </div>
+    </div>
+    <!-- 순위표 -->
+    <div class="card">
+     <div class="row" style="margin:0 0 8px;justify-content:space-between">
+      <h2 style="margin:0" id="tblTitle">학생 현황</h2>
+      <select id="roundSel" class="btn hide-big" style="padding:6px 10px"></select>
+     </div>
+     <div class="tblwrap"><table id="tbl"></table></div>
+    </div>
+   </div>
+   <div class="side">
+    <div class="card"><h2>누적 순위 <span class="act">(실전 라운드 합계)</span></h2><div class="tot" id="tot"><p class="empty">아직 실전 기록이 없어요.</p></div></div>
+    <div class="card hide-big"><h2>도움말</h2>
+     <p class="act" style="line-height:1.7;margin:0">· 학생 주소는 이 주소에서 <b>teacher.html</b>(또는 <b>?view=teacher</b>)을 뺀 것이에요.<br>· 실전 점수: 퍼즐 1개 10점 + 빠르기 보너스(최대 5점).<br>· 모든 기록은 구글 시트의 <b>기록</b>, <b>순위</b> 탭에 남아요.<br>· 같은 이름이 두 번 들어오면 표에서 ✕로 내보낼 수 있어요.</p>
+     <div class="row"><span id="resetWrap"><button class="btn danger" id="resetBtn">모두 초기화 (새 반 시작)</button></span></div>
+    </div>
+   </div>
+  </div>
+  <div class="msg" id="msg"></div>
+ </section>
+</div>
+<script src="config.js"></script>
+<script>
+/* 화면을 밖(Vercel 등)에 올린 경우: config.js의 API_URL로 앱스스크립트와 데이터만 주고받는다 */
+function apiReady(){return typeof window.API_URL==='string'&&/^https:\/\/script\.google(usercontent)?\.com\/.+\/exec/.test(window.API_URL)}
+function call(fn){const args=[].slice.call(arguments,1);
+ if(window.API_URL!==undefined){
+  if(!apiReady())return Promise.reject(new Error('config.js에 앱스스크립트 웹 앱 주소(…/exec)를 넣어 주세요.'));
+  const ctl=window.AbortController?new AbortController():null;const tm=setTimeout(()=>{if(ctl)ctl.abort()},20000);
+  return fetch(window.API_URL,{method:'POST',headers:{'Content-Type':'text/plain;charset=utf-8'},body:JSON.stringify({fn:fn,args:args}),redirect:'follow',signal:ctl?ctl.signal:undefined})
+   .then(r=>{if(!r.ok)throw new Error('서버 응답 오류 ('+r.status+')');return r.json()})
+   .then(j=>{if(!j||!j.ok)throw new Error((j&&j.error)||'알 수 없는 오류');return j.data})
+   .catch(e=>{if(e&&e.name==='AbortError')throw new Error('서버 응답이 늦어요');throw e})
+   .finally(()=>clearTimeout(tm))}
+ return new Promise((res,rej)=>{
+ if(window.google&&google.script&&google.script.run){google.script.run.withSuccessHandler(res).withFailureHandler(e=>rej(e))[fn].apply(null,args)}
+ else if(window.__gs){window.__gs(fn,args).then(r=>{if(r&&r.__err)rej(new Error(r.__err));else res(r)},rej)}
+ else rej(new Error('서버에 연결할 수 없어요'))})}
+const $=id=>document.getElementById(id);
+const errText=e=>String((e&&e.message)||e).replace(/^(Error|Exception):\s*/,'');
+const GN={fill:'그림 채우기',speed:'스피드 퍼즐',domino:'도미노 도전',free:'자유 연습'};
+const T={pw:'',game:'fill',mode:'practice',view:'',data:null,offset:0,timer:null};
+try{T.pw=sessionStorage.getItem('poly_pw')||''}catch(e){}
+
+async function login(){
+ const pw=$('pw').value||T.pw;
+ try{await call('api_t_login',pw);T.pw=pw;try{sessionStorage.setItem('poly_pw',pw)}catch(e){}
+  $('login').hidden=true;$('dash').hidden=false;refresh()}
+ catch(e){$('loginMsg').textContent=errText(e)}
+}
+$('loginBtn').onclick=login;$('pw').addEventListener('keydown',e=>{if(e.key==='Enter')login()});
+if(T.pw){$('pw').value=T.pw;login()}
+
+/* 설정 */
+document.querySelectorAll('#games .g').forEach(b=>b.onclick=()=>{T.game=b.dataset.g;document.querySelectorAll('#games .g').forEach(x=>x.classList.toggle('on',x===b));setMode(T.mode)});
+document.querySelectorAll('#modeSeg button').forEach(b=>b.onclick=()=>setMode(b.dataset.m));
+function setMode(m){const only=T.game==='domino'||T.game==='free';T.mode=only?'practice':m;
+ document.querySelectorAll('#modeSeg button').forEach(b=>{b.classList.toggle('on',b.dataset.m===T.mode);b.disabled=only&&b.dataset.m==='real'});
+ $('modeNote').textContent=only?'이 게임은 연습만 할 수 있어요.':(T.mode==='real'?(T.game==='speed'?'모두 같은 순서로 15세트':'모두 같은 순서로 그림 11개')+' · 점수·순위 기록':'학생이 퍼즐을 골라서 · 점수 없음');
+ $('mins').value=T.mode==='real'?10:5}
+document.querySelectorAll('[data-d]').forEach(b=>b.onclick=()=>{$('mins').value=Math.max(1,Math.min(60,(+$('mins').value||5)+(+b.dataset.d)))});
+setMode('practice');
+
+async function ctl(action,opt){$('msg').textContent='';
+ try{await call('api_t_control',T.pw,action,opt||{});T.view='';await refresh(true)}catch(e){$('msg').textContent=errText(e)}}
+$('startBtn').onclick=()=>ctl('start',{game:T.game,mode:T.mode,minutes:+$('mins').value});
+$('pauseBtn').onclick=()=>ctl(T.data&&T.data.state.status==='paused'?'resume':'pause');
+$('addBtn').onclick=()=>ctl('addtime',{minutes:1});
+function confirmIn(wrapId,text,yes){const w=$(wrapId),old=w.innerHTML;
+ w.innerHTML=`<span class="confirm">${text} <button class="btn danger">예</button><button class="btn">아니요</button></span>`;
+ const[b1,b2]=w.querySelectorAll('button');const back=()=>{w.innerHTML=old;bindDanger()};
+ b1.onclick=()=>{back();yes()};b2.onclick=back}
+function bindDanger(){
+ if($('endBtn'))$('endBtn').onclick=()=>confirmIn('endWrap','지금 끝낼까요?',()=>ctl('end'));
+ if($('resetBtn'))$('resetBtn').onclick=()=>confirmIn('resetWrap','학생·기록 현황을 모두 지울까요? (시트 기록은 남아요)',()=>ctl('reset'));
+}
+bindDanger();
+$('roundSel').onchange=()=>{T.view=$('roundSel').value;refresh(true)};
+$('bigBtn').onclick=()=>{document.body.classList.toggle('big');$('bigBtn').textContent=document.body.classList.contains('big')?'작게 보기':'크게 보기'};
+
+/* 새로 고침 */
+async function refresh(once){
+ clearTimeout(T.timer);
+ try{const t0=Date.now();const d=await call('api_t_state',T.pw,T.view||null);T.offset=d.now-(t0+Date.now())/2;T.data=d;draw(d);$('msg').textContent=''}
+ catch(e){$('msg').textContent='연결 문제: '+errText(e)}
+ T.timer=setTimeout(refresh,3000);
+}
+function fmt(ms){const s=Math.max(0,Math.ceil(ms/1000));return Math.floor(s/60)+':'+String(s%60).padStart(2,'0')}
+function draw(d){
+ const s=d.state,live=s.status==='running'||s.status==='paused';
+ $('cOn').textContent=d.counts.online;$('cJoin').textContent=d.counts.joined;
+ $('setup').hidden=live;$('running').hidden=!(live||s.status==='ended');
+ $('pauseBtn').hidden=!live;$('addBtn').hidden=!live;$('endWrap').hidden=!live;
+ if(s.roundId){
+  const st={running:'진행 중',paused:'일시정지',ended:'끝남'}[s.status]||'';
+  $('stBadge').textContent=st;$('stBadge').className='badge '+(s.status==='running'?'':s.status);
+  $('mdBadge').textContent=s.mode==='real'?'실전':'연습';$('mdBadge').className='badge '+(s.mode==='real'?'real':'prac');
+  $('stLabel').textContent=GN[s.game]+' · '+s.roundId;
+  $('pauseBtn').textContent=s.status==='paused'?'▶ 다시 시작':'⏸ 일시정지';
+ }
+ // 라운드 선택
+ const sel=$('roundSel');const cur=T.view||(s.roundId||'');
+ sel.innerHTML=(d.rounds.length?'':'<option value="">라운드 없음</option>')+d.rounds.slice().reverse().map(r=>`<option value="${r.id}"${r.id===cur?' selected':''}>${r.label}${r.id===s.roundId&&live?' (지금)':''}</option>`).join('');
+ const rd=d.round;const real=rd&&rd.mode==='real';
+ $('tblTitle').textContent=rd?(real?'실시간 순위':'연습 현황')+' · '+rd.label:'학생 현황';
+ if($('tbl').querySelector('.confirm'))return drawTot(d);
+ let h='<tr><th>'+(real?'순위':'')+'</th><th>이름</th>'+(real?'<th style="text-align:right">점수</th>':'')+'<th style="text-align:right">완성</th>'+(real?'<th>진행</th>':'')+'<th>지금 하는 일</th><th class="hide-big"></th></tr>';
+ if(!d.rows.length)h+='<tr><td colspan="7" class="empty">아직 입장한 학생이 없어요.</td></tr>';
+ let rank=0,prev=null;
+ d.rows.forEach((x,i)=>{const key=x.score+'/'+x.solved;if(key!==prev){rank=i+1;prev=key}
+  const pc=d.puzzleCount||1;const prog=real?`<td style="white-space:nowrap">${Math.min(x.idx,pc)}/${pc}<span class="bar"><i style="width:${100*Math.min(x.idx,pc)/pc}%"></i></span>${x.skips?` <span class="act">건너뜀 ${x.skips}</span>`:''}</td>`:'';
+  h+=`<tr><td>${real?`<span class="rk ${x.score>0&&rank<=3?'r'+rank:''}">${rank}</span>`:''}</td><td><span class="dot${x.online?' on':''}"></span><span class="nm">${esc(x.name)}</span></td>${real?`<td class="n" style="color:var(--acc);font-size:18px">${x.score}</td>`:''}<td class="n">${x.solved}</td>${prog}<td class="act">${x.online?esc(x.activity||''):'접속 끊김'+(x.seenAgo!=null?` (${x.seenAgo}초 전)`:'')}</td><td class="hide-big"><button class="x" title="내보내기" data-k="${esc(x.name)}">✕</button></td></tr>`});
+ $('tbl').innerHTML=h;
+ $('tbl').querySelectorAll('.x').forEach(b=>b.onclick=()=>{const n=b.dataset.k;b.outerHTML=`<span class="confirm">내보낼까요? <button class="btn danger" style="padding:4px 8px">예</button></span>`;
+  $('tbl').querySelector('.confirm .btn').onclick=()=>ctl('kick',{name:n})});
+ drawTot(d);
+}
+function drawTot(d){
+ $('tot').innerHTML=d.total.length?'<ol>'+d.total.map((x,i)=>`<li><span><span class="rk ${i<3&&x.score>0?'r'+(i+1):''}" style="width:24px;height:24px;font-size:12px">${i+1}</span> ${esc(x.name)}</span><span>${x.score}점 · ${x.solved}개</span></li>`).join('')+'</ol>':'<p class="empty">아직 실전 기록이 없어요.</p>';
+}
+function esc(s){return String(s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]))}
+setInterval(()=>{const d=T.data;if(!d)return;const s=d.state;
+ if(s.status==='running'){const left=s.endAt-(Date.now()+T.offset);$('clock').textContent=fmt(left);$('clock').classList.toggle('low',left<30000);if(left<=0&&!T.z){T.z=1;setTimeout(()=>{T.z=0;refresh()},1200)}}
+ else if(s.status==='paused')$('clock').textContent=fmt(s.remainMs);else if(s.status==='ended')$('clock').textContent='끝';},250);
+</script>
+</body>
+</html>
