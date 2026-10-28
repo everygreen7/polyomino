@@ -98,6 +98,7 @@ input.name{width:100%;font-size:22px;padding:12px 14px;border:2.5px solid var(--
 .num.done{border-color:var(--ok);background:#e3f4ea;color:var(--ok)}
 .num.done::after{content:"✓";font-size:12px;margin-left:2px}
 .num.cur{outline:3px solid var(--ink);outline-offset:1px}
+.num.lock{background:#efebe4;border-color:#e2dcd2;color:#b9b0a3;cursor:not-allowed;font-size:13px}
 .ptitle2{font-family:var(--display);font-size:20px;text-align:center;margin:2px 0}
 .hintc{font-size:12px;opacity:.8;display:block;margin-top:1px}
 .grid6{position:relative;touch-action:manipulation;margin:6px auto 8px}
@@ -251,7 +252,7 @@ async function poll(){
 }
 async function apply(r){
  const s=r.state;A.state=s;A.lastPoll=r;
- if(r.me&&!A.busy)A.me=r.me;
+ if(r.me&&!A.busy){A.me=r.me;if(A.game==='fill'&&A.mode==='real'&&!$('nums').hidden&&A.fill.shownReach!==reachN())drawNums()}
  if(r.cls){A.cls=r.cls;$('fClass').textContent=r.cls.shapes}
  $('pauseOv').hidden=s.status!=='paused';
  const live=s.status==='running'||s.status==='paused';
@@ -385,13 +386,18 @@ function dMsg(t,c){$('dMsg').textContent=t||'';$('dMsg').className='msg'+(c?' '+
 const realList=()=>A.bank.fill.real;
 const isDone=i=>!!(A.me&&A.me.done&&A.me.done[i]);
 const hintsUsed=i=>(A.me&&A.me.hintBy&&A.me.hintBy[i])||0;
-function firstOpen(){const L=realList();for(let i=0;i<L.length;i++)if(!isDone(i))return i;return 0}
+const reachN=()=>(A.me&&A.me.reach)||0;
+function firstOpen(){const R=reachN();for(let i=0;i<=R;i++)if(!isDone(i))return i;return R}
+/* 다음으로 갈 문제: 지금 번호 뒤의 안 푼 문제 → 없으면 앞쪽의 안 푼 문제 (열린 번호 안에서만) */
+function nextOpen(from){const R=reachN();for(let j=from+1;j<=R;j++)if(!isDone(j))return j;for(let j=0;j<from;j++)if(!isDone(j))return j;return -1}
 function drawNums(){const L=realList(),cur=A.fill.cur;
- $('nums').innerHTML=L.map((p,i)=>`<button class="num${isDone(i)?' done':A.fill.seen[i]?' seen':''}${i===cur?' cur':''}" data-i="${i}">${i+1}</button>`).join('');
- $('nums').querySelectorAll('.num').forEach(b=>b.onclick=()=>{if(!A.busy)openReal(+b.dataset.i)});
+ const R=reachN();A.fill.shownReach=R;
+ $('nums').innerHTML=L.map((p,i)=>i>R?`<button class="num lock" disabled aria-label="${i+1}번 잠김">🔒${i+1}</button>`:`<button class="num${isDone(i)?' done':A.fill.seen[i]?' seen':''}${i===cur?' cur':''}" data-i="${i}">${i+1}</button>`).join('');
+ $('nums').querySelectorAll('.num[data-i]').forEach(b=>b.onclick=()=>{if(!A.busy)openReal(+b.dataset.i)});
  const on=$('nums').querySelector('.cur');if(on)on.scrollIntoView({inline:'center',block:'nearest'})}
 function savePuzzle(){if(P&&P.opt.real)A.fill.saved[P.opt.idx]=P.pieces.map(p=>({cells:p.cells,pos:p.pos}))}
 function openReal(i){
+ if(i>reachN())i=reachN();
  savePuzzle();const L=realList();A.fill.cur=i;A.fill.seen[i]=1;
  $('plist').hidden=true;$('nums').hidden=false;drawNums();
  const solvedN=L.filter((_,k)=>isDone(k)).length;
@@ -422,7 +428,7 @@ function loadPuzzle(puz,opt){
  if(opt.real){const u=hintsUsed(opt.idx),left=2-u;
   c.innerHTML=`<button class="btn" id="bRot">🔄 돌리기</button><button class="btn" id="bFlip">↔️ 뒤집기</button><button class="btn" id="bReset">처음부터</button>`+
    `<button class="btn" id="bHint"${puz.noHint||left<=0?' disabled':''}>힌트 ${puz.noHint?'없음':left+'번'}<span class="hintc">${puz.noHint?'이 문제는 금지':'1번에 −3점'}</span></button>`+
-   `<button class="btn pri" id="bNext" style="grid-column:span 4">다음 문제 →</button>`}
+   `<button class="btn pri" id="bNext" style="grid-column:span 4">${opt.idx===reachN()&&opt.idx<realList().length-1&&!isDone(opt.idx)?'넘어가기 → (다음 번호 열기)':'다음 문제 →'}</button>`}
  else{c.innerHTML=`<button class="btn" id="bRot">🔄 돌리기</button><button class="btn" id="bFlip">↔️ 뒤집기</button><button class="btn" id="bReset">처음부터</button>`+
   (puz.impossible?`<button class="btn on" id="bColor">색칠 보기</button><button class="btn pri wide" id="bImp">불가능해요!</button>`:`<button class="btn" id="bHint">힌트</button>`)+
   `<button class="btn${puz.impossible?' wide':''}" id="bNext"${puz.impossible?'':' style="grid-column:span 4"'}>다음 그림 →</button>`}
@@ -430,7 +436,7 @@ function loadPuzzle(puz,opt){
  $('bFlip').onclick=()=>{if(P.sel!==null)turn(P.sel,flip);else setMsg('먼저 조각을 하나 톡 눌러 골라요.')};
  $('bReset').onclick=()=>{if(P.solved)return;P.pieces.forEach(p=>p.pos=null);P.sel=null;render()};
  if($('bHint'))$('bHint').onclick=opt.real?realHint:hint;
- $('bNext').onclick=()=>{if(opt.real){const L=realList();for(let k=1;k<=L.length;k++){const j=(opt.idx+k)%L.length;if(!isDone(j))return openReal(j)}}else{const L=A.bank.fill.practice;openPractice((P.opt.idx+1)%L.length)}};
+ $('bNext').onclick=()=>{if(opt.real){goNext(opt.idx)}else{const L=A.bank.fill.practice;openPractice((P.opt.idx+1)%L.length)}};
  if($('bImp'))$('bImp').onclick=claimImpossible;
  if($('bColor'))$('bColor').onclick=()=>{P.colors=!P.colors;$('bColor').classList.toggle('on',!P.colors);render()};
  $('gnote').textContent='조각을 톡 누르면 돌아가요. 판 밖으로 끌어내면 빠져요.'+(opt.real?' 위 번호를 눌러 다른 문제로 갔다 와도 놓은 조각은 그대로예요.':'');
@@ -488,11 +494,22 @@ function check(){
  if(!P||P.solved||P.puz.impossible)return;if(P.pieces.some(p=>!p.pos))return;
  P.solved=true;if(P.opt.real)submitReal();else submitPractice();
 }
+/* 다음 문제: 가장 앞선 번호에서 누르면 서버에 알리고 다음 번호를 연다 */
+async function goNext(i){
+ if(A.busy)return;const R=reachN(),L=realList();
+ if(i===R&&R<L.length-1&&!isDone(i)){
+  A.busy=true;$('bNext').disabled=true;
+  try{const r=await call('api_skip',A.name,A.token,{roundId:A.round,puzzle:i});A.me=r.me;A.busy=false;openReal(reachN())}
+  catch(e){A.busy=false;$('bNext').disabled=false;setMsg(errText(e),'bad')}
+  return}
+ const j=nextOpen(i);
+ if(j>=0)openReal(j);else if(i!==R)openReal(R);else setMsg('열린 문제를 모두 풀었어요!','ok');
+}
 async function submitReal(){
  A.busy=true;setMsg('확인하는 중…');const i=P.opt.idx;
  try{const r=await call('api_submit',A.name,A.token,{roundId:A.round,game:'fill',puzzle:i,placements:placements()});
   A.me=r.me;savePuzzle();updTop();toast('+'+r.points+'점',r.hints?('힌트 '+r.hints+'번 사용'):'');drawNums();
-  setTimeout(()=>{A.busy=false;const L=realList();for(let k=1;k<=L.length;k++){const j=(i+k)%L.length;if(!isDone(j))return openReal(j)}openReal(i)},1100);
+  setTimeout(()=>{A.busy=false;const j=nextOpen(i);openReal(j>=0?j:i)},1100);
  }catch(e){A.busy=false;P.solved=false;setMsg(errText(e),'bad')}
 }
 async function submitPractice(){

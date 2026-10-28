@@ -338,7 +338,7 @@ function drawTable(d,rd){
  if($('tbl').querySelector('.confirm'))return;
  const real=rd&&rd.mode==='real',g=rd?rd.game:null;
  $('tblTitle').textContent=rd?(real?'실시간 순위':'학생 현황')+' · '+rd.label:'학생 현황';
- const cols=real?['순위','이름','점수','완성','힌트','지금 하는 일','']:g==='find'?['','이름','찾은 모양','확인 대기','지금 하는 일','']:g==='domino'?['','이름','기록한 방법','지금 하는 일','']:['','이름','완성','지금 하는 일',''];
+ const cols=real?['순위','이름','점수','완성','도착','힌트','지금 하는 일','']:g==='find'?['','이름','찾은 모양','확인 대기','지금 하는 일','']:g==='domino'?['','이름','기록한 방법','지금 하는 일','']:['','이름','완성','지금 하는 일',''];
  let h='<tr>'+cols.map(c=>`<th>${c}</th>`).join('')+'</tr>';
  if(!d.rows.length)h+=`<tr><td colspan="${cols.length}" class="empty">아직 입장한 학생이 없어요.</td></tr>`;
  let rank=0,prev=null;
@@ -346,7 +346,7 @@ function drawTable(d,rd){
   const act=`<td class="act">${x.online?esc(x.activity||''):'접속 끊김'+(x.seenAgo!=null?` (${x.seenAgo}초 전)`:'')}</td>`;
   const nm=`<td><span class="dot${x.online?' on':''}"></span><span class="nm">${esc(x.name)}</span></td>`;
   const kick=`<td class="hide-big"><button class="x" title="내보내기" data-k="${esc(x.name)}">✕</button></td>`;
-  if(real)h+=`<tr><td><span class="rk ${x.score>0&&rank<=3?'r'+rank:''}">${rank}</span></td>${nm}<td class="n" style="color:var(--acc);font-size:18px">${x.score}</td><td class="n">${x.solved}/${d.puzzleCount}</td><td class="n">${x.hints||0}</td>${act}${kick}</tr>`;
+  if(real)h+=`<tr><td><span class="rk ${x.score>0&&rank<=3?'r'+rank:''}">${rank}</span></td>${nm}<td class="n" style="color:var(--acc);font-size:18px">${x.score}</td><td class="n">${x.solved}/${d.puzzleCount}</td><td class="n">${(x.reach||0)+1}번</td><td class="n">${x.hints||0}</td>${act}${kick}</tr>`;
   else if(g==='find')h+=`<tr><td></td>${nm}<td class="n">${x.found}</td><td class="n">${x.wrong}</td>${act}${kick}</tr>`;
   else if(g==='domino')h+=`<tr><td></td>${nm}<td class="n">${x.dom}</td>${act}${kick}</tr>`;
   else h+=`<tr><td></td>${nm}<td class="n">${x.solved}</td>${act}${kick}</tr>`});
