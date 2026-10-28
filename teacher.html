@@ -89,6 +89,37 @@ td.n{font-variant-numeric:tabular-nums;text-align:right;font-weight:800}
 .dist span{background:#f3eee6;border-radius:999px;padding:3px 10px;font-size:13px;font-weight:700}
 .dist span b{color:var(--acc)}
 .big .shapes{grid-template-columns:repeat(auto-fill,minmax(170px,1fr))}.big .sh .lt{font-size:32px}.big .sh .who{font-size:18px}
+/* ═════ 발견한 펜토미노 크게 보기 (프로젝터용 내부 창) ═════ */
+.fv{position:fixed;inset:0;z-index:100;background:var(--paper);background-image:linear-gradient(var(--grid) 1px,transparent 1px),linear-gradient(90deg,var(--grid) 1px,transparent 1px);background-size:32px 32px;display:flex;flex-direction:column;padding:22px 34px 26px;overflow:auto}
+.fv-top{display:flex;align-items:center;gap:18px;flex-wrap:wrap}
+.fv-title{font:400 44px/1.1 var(--display);margin:0;flex:1;min-width:300px}
+.fv-title b{font-weight:400;color:var(--acc);background:linear-gradient(transparent 58%,var(--sun) 58%,var(--sun) 92%,transparent 92%);padding:0 6px}
+.fv-clock{font:400 56px/1 var(--display);font-variant-numeric:tabular-nums}
+.fv-pend{font-weight:800;font-size:15px;border-radius:999px;padding:6px 14px;background:#fff3c4;border:2px solid #e0b400;white-space:nowrap}
+.fv-pend[data-n="0"]{display:none}
+.fv-opts{display:flex;gap:14px;font-size:15px;color:var(--sub);font-weight:700;align-items:center}
+.fv-x{font-size:28px;line-height:1;width:52px;height:52px;border-radius:50%;border:2.5px solid var(--ink);background:#fff;cursor:pointer}
+.fv-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(210px,1fr));gap:18px;margin-top:20px}
+.fv-card{border:3px solid var(--ink);border-radius:20px 12px 22px 14px;background:#fff;padding:14px 10px 12px;display:flex;flex-direction:column;align-items:center;gap:8px;cursor:pointer;font-family:var(--body);min-height:250px;justify-content:space-between}
+.fv-card .lt{font:400 46px/1 var(--display);color:var(--acc)}
+.fv-card .nm{font-size:24px;font-weight:900}
+.fv-card .ct{font-size:16px;color:var(--sub);font-weight:700}
+.fv-card.on{border-color:var(--acc);box-shadow:0 0 0 5px var(--acc-soft)}
+.fv-card.new{animation:fvnew 1.6s ease-out}
+@keyframes fvnew{0%{transform:scale(.6);box-shadow:0 0 0 0 rgba(214,51,108,.6)}40%{transform:scale(1.06)}100%{transform:none;box-shadow:0 0 0 22px rgba(214,51,108,0)}}
+@media (prefers-reduced-motion:reduce){.fv-card.new{animation:none}}
+.fv-card.slot{border-style:dashed;border-color:var(--line);cursor:default;justify-content:center;font:400 54px var(--display);color:#cfc8bd}
+.fv-empty{font:400 34px var(--display);color:var(--mute);text-align:center;margin-top:80px}
+.fv-detail{margin-top:20px;border:3px dashed var(--acc);border-radius:18px;background:#fffafb;padding:16px 20px}
+.fv-detail h3{font:400 28px var(--display);margin:0 0 12px}
+.fv-detail .subs .sub{padding:10px 12px}.fv-detail .subs .sub b{font-size:18px}
+.fv-wrong{margin-top:22px}
+.fv-wrong h3{font:400 28px var(--display);margin:0 0 10px}
+.fv-wrong .rv .sub b{font-size:18px}
+.fbig{font-size:14px;padding:7px 12px}
+.nm{white-space:nowrap}
+@media (max-width:640px){#pReview{order:-1;border-color:#e0b400;box-shadow:0 0 0 3px #fff3c4}}
+@media (max-width:640px){.fv{padding:14px}.fv-title{font-size:30px}.fv-clock{font-size:36px}.fv-grid{grid-template-columns:repeat(auto-fill,minmax(140px,1fr))}.fv-card{min-height:180px}}
 </style>
 </head>
 <body>
@@ -141,7 +172,7 @@ td.n{font-variant-numeric:tabular-nums;text-align:right;font-weight:800}
     <!-- 펜토미노 찾기 -->
     <div class="card" id="pFind" hidden>
      <div class="row" style="margin:0 0 10px;justify-content:space-between"><h2 style="margin:0">발견한 펜토미노 <span id="fCount" style="color:var(--acc)"></span></h2>
-      <label class="small hide-big"><input type="checkbox" id="showSlots"> 빈칸 12개 보이기</label></div>
+      <span class="row" style="margin:0;gap:10px"><label class="small hide-big"><input type="checkbox" id="showSlots"> 빈칸 12개 보이기</label><button class="btn pri fbig" id="fvOpen">⛶ 크게 띄우기</button></span></div>
      <div class="shapes" id="fShapes"></div>
      <div class="detail" id="fDetail" hidden></div>
     </div>
@@ -173,6 +204,19 @@ td.n{font-variant-numeric:tabular-nums;text-align:right;font-weight:800}
    </div>
   </div>
   <div class="msg" id="msg"></div>
+ </section>
+ <!-- 발견한 펜토미노 크게 보기 (프로젝터용) -->
+ <section class="fv" id="fv" hidden role="dialog" aria-label="발견한 펜토미노 크게 보기">
+  <div class="fv-top">
+   <h2 class="fv-title">우리 반이 찾은 펜토미노 <b id="fvCount">0가지</b></h2>
+   <span class="fv-pend" id="fvPend" data-n="0"></span>
+   <div class="fv-opts"><label><input type="checkbox" id="fvSlots"> 빈칸 12개</label><label><input type="checkbox" id="fvWrong" checked> 펜토미노가 아닌 모양</label></div>
+   <span class="fv-clock" id="fvClock"></span>
+   <button class="fv-x" id="fvClose" aria-label="닫기">✕</button>
+  </div>
+  <div class="fv-grid" id="fvGrid"></div>
+  <div class="fv-detail" id="fvDetail" hidden></div>
+  <div class="fv-wrong" id="fvWrongBox" hidden><h3>펜토미노가 아닌 모양 <span class="act" style="font-size:16px">왜 안 될까요?</span></h3><div class="rv" id="fvWrongList"></div></div>
  </section>
 </div>
 <script src="config.js"></script>
@@ -263,7 +307,7 @@ function draw(d){
  $('pFind').hidden=!d.find;$('pReview').hidden=!d.find;$('pWrong').hidden=!(d.find&&d.find.approved.length);
  if(d.find)drawFind(d.find);
  $('pDom').hidden=!d.dom;if(d.dom)drawDom(d.dom,d.rows);
- drawTable(d,rd);drawTot(d);
+ drawTable(d,rd);drawTot(d);drawFV(d);
 }
 function drawFind(f){
  const n=f.groups.length;$('fCount').textContent=n+'가지';
@@ -313,9 +357,36 @@ function drawTable(d,rd){
 function drawTot(d){
  $('tot').innerHTML=d.total.length?'<ol>'+d.total.map((x,i)=>`<li><span><span class="rk ${i<3&&x.score>0?'r'+(i+1):''}" style="width:24px;height:24px;font-size:12px">${i+1}</span> ${esc(x.name)}</span><span>${x.score}점 · ${x.solved}개</span></li>`).join('')+'</ol>':'<p class="empty">아직 실전 기록이 없어요.</p>';
 }
+
+/* ═════ 발견한 펜토미노 크게 보기 ═════ */
+const FV={open:false,known:null,sel:null};
+function fvOpen(){FV.open=true;FV.known=null;$('fv').hidden=false;document.body.style.overflow='hidden';if(T.data)drawFV(T.data)}
+function fvClose(){FV.open=false;$('fv').hidden=true;document.body.style.overflow=''}
+$('fvOpen').onclick=fvOpen;$('fvClose').onclick=fvClose;
+addEventListener('keydown',e=>{if(e.key==='Escape'&&FV.open)fvClose()});
+$('fvSlots').onchange=$('fvWrong').onchange=()=>T.data&&drawFV(T.data);
+function drawFV(d){
+ if(!FV.open)return;const f=d.find;
+ if(!f){$('fvGrid').innerHTML='<p class="fv-empty" style="grid-column:1/-1">지금은 펜토미노 찾기 활동이 아니에요.</p>';$('fvDetail').hidden=true;$('fvWrongBox').hidden=true;$('fvCount').textContent='';return}
+ const n=f.groups.length;$('fvCount').textContent=n+'가지';
+ const p=$('fvPend');p.dataset.n=f.pending.length;p.textContent='검토 대기 '+f.pending.length;
+ const first=FV.known===null;if(first)FV.known=new Set();
+ let h=f.groups.map(gp=>{const a=gp.subs[0],isNew=!first&&!FV.known.has(gp.canon);FV.known.add(gp.canon);
+  return `<button class="fv-card${FV.sel===gp.canon?' on':''}${isNew?' new':''}" data-c="${gp.canon}"><span class="lt">${gp.letter}</span>${shp(a.cells,30,'#ffd66b')}<span class="nm">${esc(a.name)}</span><span class="ct">${gp.subs.length}명이 찾음</span></button>`}).join('');
+ if($('fvSlots').checked)for(let i=n;i<12;i++)h+='<div class="fv-card slot">?</div>';
+ if(!n&&!$('fvSlots').checked)h='<p class="fv-empty" style="grid-column:1/-1">아직 찾은 모양이 없어요. 첫 번째 주인공은 누구일까요?</p>';
+ $('fvGrid').innerHTML=h;
+ $('fvGrid').querySelectorAll('.fv-card[data-c]').forEach(b=>b.onclick=()=>{FV.sel=FV.sel===b.dataset.c?null:b.dataset.c;drawFV(T.data);if(FV.sel)$('fvDetail').scrollIntoView({behavior:'smooth',block:'nearest'})});
+ const gp=f.groups.find(x=>x.canon===FV.sel);$('fvDetail').hidden=!gp;
+ if(gp)$('fvDetail').innerHTML=`<h3>${gp.letter} 모양을 찾은 친구 ${gp.subs.length}명 <span class="act" style="font-size:16px">찾은 순서 · 각자 그린 방향 그대로</span></h3><div class="subs">`+
+  gp.subs.map((x,i)=>`<div class="sub">${shp(x.cells,18,i?'#8fd6cd':'#ffd66b')}<b>${i+1}. ${esc(x.name)}</b><span class="small">${tm(x.t)}</span></div>`).join('')+'</div>';
+ const showW=$('fvWrong').checked&&f.approved.length;$('fvWrongBox').hidden=!showW;
+ if(showW)$('fvWrongList').innerHTML=f.approved.map(x=>`<div class="sub">${shp(x.cells,18,'#f7c7b5')}<b>${esc(x.name)}</b><span class="small">${x.cells.length}칸</span></div>`).join('');
+}
 setInterval(()=>{const d=T.data;if(!d)return;const s=d.state;
  if(s.status==='running'){const left=s.endAt-(Date.now()+T.offset);$('clock').textContent=fmt(left);$('clock').classList.toggle('low',left<30000);if(left<=0&&!T.z){T.z=1;setTimeout(()=>{T.z=0;refresh()},1200)}}
- else if(s.status==='paused')$('clock').textContent=fmt(s.remainMs);else if(s.status==='ended')$('clock').textContent='끝';},250);
+ else if(s.status==='paused')$('clock').textContent=fmt(s.remainMs);else if(s.status==='ended')$('clock').textContent='끝';
+ if(FV.open)$('fvClock').textContent=(s.status==='running'||s.status==='paused')?$('clock').textContent:'';},250);
 </script>
 </body>
 </html>
